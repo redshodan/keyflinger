@@ -49,9 +49,9 @@ public class KeyFlinger extends InputMethodService
     private long mLastShiftTime;
     private long mMetaState;
     
-    private LatinKeyboard mSymbolsKeyboard;
-    private LatinKeyboard mSymbolsShiftedKeyboard;
-    private LatinKeyboard mQwertyKeyboard;
+    private LatinKeyboard mFlingMTKeyboard;
+    private LatinKeyboard m4x4Keyboard;
+    private LatinKeyboard m4x4ShiftedKeyboard;
     
     private LatinKeyboard mCurKeyboard;
     
@@ -77,7 +77,7 @@ public class KeyFlinger extends InputMethodService
      */
     @Override public void onInitializeInterface()
     {
-        if (mQwertyKeyboard != null)
+        if (m4x4Keyboard != null)
         {
             // Configuration changes can happen after the keyboard gets
             // recreated, so we need to be able to re-build the keyboards if the
@@ -86,9 +86,9 @@ public class KeyFlinger extends InputMethodService
             if (displayWidth == mLastDisplayWidth) return;
             mLastDisplayWidth = displayWidth;
         }
-        mQwertyKeyboard = new LatinKeyboard(this, R.xml.qwerty);
-        mSymbolsKeyboard = new LatinKeyboard(this, R.xml.symbols);
-        mSymbolsShiftedKeyboard = new LatinKeyboard(this, R.xml.symbols_shift);
+        mFlingMTKeyboard = new LatinKeyboard(this, R.xml.qwerty);
+        m4x4Keyboard = new LatinKeyboard(this, R.xml.fourbyfour);
+        m4x4ShiftedKeyboard = new LatinKeyboard(this, R.xml.fourbyfourshifted);
     }
     
     /**
@@ -103,7 +103,7 @@ public class KeyFlinger extends InputMethodService
             (LatinKeyboardView) getLayoutInflater().inflate(R.layout.input,
                                                             null);
         mInputView.setOnKeyboardActionListener(this);
-        mInputView.setKeyboard(mQwertyKeyboard);
+        mInputView.setKeyboard(m4x4Keyboard);
         mInputView.setKeyFlinger(this);
         return mInputView;
     }
@@ -167,13 +167,13 @@ public class KeyFlinger extends InputMethodService
         case EditorInfo.TYPE_CLASS_DATETIME:
             // Numbers and dates default to the symbols keyboard, with
             // no extra features.
-            mCurKeyboard = mSymbolsKeyboard;
+            mCurKeyboard = m4x4Keyboard;
             break;
                 
         case EditorInfo.TYPE_CLASS_PHONE:
             // Phones will also default to the symbols keyboard, though
             // often you will want to have a dedicated phone keyboard.
-            mCurKeyboard = mSymbolsKeyboard;
+            mCurKeyboard = m4x4Keyboard;
             break;
                 
         case EditorInfo.TYPE_CLASS_TEXT:
@@ -181,7 +181,7 @@ public class KeyFlinger extends InputMethodService
             // normal alphabetic keyboard, and assume that we should
             // be doing predictive text (showing candidates as the
             // user types).
-            mCurKeyboard = mQwertyKeyboard;
+            mCurKeyboard = m4x4Keyboard;
             mPredictionOn = true;
                 
             // We now look for a few special variations of text that will
@@ -225,7 +225,7 @@ public class KeyFlinger extends InputMethodService
         default:
             // For all unknown input types, default to the alphabetic
             // keyboard with no special features.
-            mCurKeyboard = mQwertyKeyboard;
+            mCurKeyboard = m4x4Keyboard;
             updateShiftKeyState(attribute);
         }
         
@@ -252,7 +252,7 @@ public class KeyFlinger extends InputMethodService
         // its window.
         setCandidatesViewShown(false);
         
-        mCurKeyboard = mQwertyKeyboard;
+        mCurKeyboard = m4x4Keyboard;
         if (mInputView != null)
         {
             mInputView.closing();
@@ -477,7 +477,7 @@ public class KeyFlinger extends InputMethodService
     {
         if ((attr != null) &&
             (mInputView != null) &&
-            (mQwertyKeyboard == mInputView.getKeyboard()))
+            (m4x4Keyboard == mInputView.getKeyboard()))
         {
             int caps = 0;
             EditorInfo ei = getCurrentInputEditorInfo();
@@ -586,17 +586,17 @@ public class KeyFlinger extends InputMethodService
                  (mInputView != null))
         {
             Keyboard current = mInputView.getKeyboard();
-            if ((current == mSymbolsKeyboard) ||
-                (current == mSymbolsShiftedKeyboard))
+            if ((current == m4x4Keyboard) ||
+                (current == m4x4ShiftedKeyboard))
             {
-                current = mQwertyKeyboard;
+                current = mFlingMTKeyboard;
             }
             else
             {
-                current = mSymbolsKeyboard;
+                current = m4x4Keyboard;
             }
             mInputView.setKeyboard(current);
-            if (current == mSymbolsKeyboard)
+            if (current == m4x4Keyboard)
             {
                 current.setShifted(false);
             }
@@ -695,23 +695,23 @@ public class KeyFlinger extends InputMethodService
         }
         
         Keyboard currentKeyboard = mInputView.getKeyboard();
-        if (mQwertyKeyboard == currentKeyboard)
+        if (m4x4Keyboard == currentKeyboard)
         {
             // Alphabet keyboard
             checkToggleCapsLock();
             mInputView.setShifted(mCapsLock || !mInputView.isShifted());
         }
-        else if (currentKeyboard == mSymbolsKeyboard)
+        else if (currentKeyboard == m4x4Keyboard)
         {
-            mSymbolsKeyboard.setShifted(true);
-            mInputView.setKeyboard(mSymbolsShiftedKeyboard);
-            mSymbolsShiftedKeyboard.setShifted(true);
+            m4x4Keyboard.setShifted(true);
+            mInputView.setKeyboard(m4x4ShiftedKeyboard);
+            m4x4ShiftedKeyboard.setShifted(true);
         }
-        else if (currentKeyboard == mSymbolsShiftedKeyboard)
+        else if (currentKeyboard == m4x4ShiftedKeyboard)
         {
-            mSymbolsShiftedKeyboard.setShifted(false);
-            mInputView.setKeyboard(mSymbolsKeyboard);
-            mSymbolsKeyboard.setShifted(false);
+            m4x4ShiftedKeyboard.setShifted(false);
+            mInputView.setKeyboard(m4x4Keyboard);
+            m4x4Keyboard.setShifted(false);
         }
     }
     
