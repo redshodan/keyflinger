@@ -28,19 +28,14 @@ import java.util.List;
 
 public class LatinKeyboardView extends KeyboardView
 {
+    static final String TAG = "KeyFlinger";
     static final int KEYCODE_OPTIONS = -100;
 
     private LatinKeyboardView mThis;
     private KeyFlinger mKeyFlinger;
     private KeyFlingDetector mFlingDetector;
-
-    // Copied from KeyboardView cause everything is bloody private.
-    private static final int NOT_A_KEY = -1;
-    private Keyboard mKeyboard;
-    private Key[] mKeys;
-    private static int MAX_NEARBY_KEYS = 12;
-    private int[] mDistances = new int[MAX_NEARBY_KEYS];
-    private int mProximityThreshold;
+    private int travelX = 10;
+    private int travelY = 10;
 
     public LatinKeyboardView(Context context, AttributeSet attrs)
     {
@@ -66,18 +61,18 @@ public class LatinKeyboardView extends KeyboardView
     protected void initKeyFlinging()
     {
         mFlingDetector = new KeyFlingDetector(getContext(),
-            new KeyFlingDetector.SimpleOnGestureListener()
+            new KeyFlingDetector.FlingListener()
             {
                 @Override
-                public boolean onFling(MotionEvent me1, MotionEvent me2,
-                                       float velocityX, float velocityY)
+                public boolean onFling(KeyFlingDetector.FlingEvent[] evs,
+                                       int idx, int pid)
                 {
-                    final float absX = Math.abs(velocityX);
-                    final float absY = Math.abs(velocityY);
-                    float deltaX = me2.getX() - me1.getX();
-                    float deltaY = me2.getY() - me1.getY();
-                    int travelX = 10;
-                    int travelY = 10;
+                    Log.d(TAG, String.format("onFling idx=%d pid=%d", idx, pid));
+                    KeyFlingDetector.FlingEvent e = evs[pid];
+                    final float absX = Math.abs(e.velocityX);
+                    final float absY = Math.abs(e.velocityY);
+                    float deltaX = e.up.getX(idx) - e.down.getX(idx);
+                    float deltaY = e.up.getY(idx) - e.down.getY(idx);
                     if ((absY < absX) && (deltaX > travelX))
                     {
                         mKeyFlinger.flingRight();
@@ -98,7 +93,7 @@ public class LatinKeyboardView extends KeyboardView
                         mKeyFlinger.flingDown();
                         return true;
                     }
-                    Log.d("KeyFlinger", "Passing in onFling");
+                    Log.d(TAG, "Passing in onFling");
                     return false;
                 }
             });
@@ -106,7 +101,7 @@ public class LatinKeyboardView extends KeyboardView
 
     @Override protected boolean onLongPress(Key key)
     {
-        Log.d("KeyFlinger", "LKV::onLongPress");
+        Log.d(TAG, "LKV::onLongPress");
         if (key.codes[0] == Keyboard.KEYCODE_CANCEL)
         {
             getOnKeyboardActionListener().onKey(KEYCODE_OPTIONS, null);
@@ -118,14 +113,14 @@ public class LatinKeyboardView extends KeyboardView
         }
     }
 
-    @Override public boolean onTouchEvent(MotionEvent me)
+    @Override public boolean onTouchEvent(MotionEvent e)
     {
-        //dumpEvent(me);
-        if (mFlingDetector.onTouchEvent(me))
+        dumpEvent(e);
+        if (mFlingDetector.onTouchEvent(e))
         {
             mKeyFlinger.ignoreNextKey();
         }
-        return super.onTouchEvent(me);
+        return super.onTouchEvent(e);
     }
 
     private void dumpEvent(MotionEvent event)
@@ -154,6 +149,6 @@ public class LatinKeyboardView extends KeyboardView
                 sb.append(";" );
         }
         sb.append("]" );
-        Log.d("KeyFlinger", sb.toString());
+        Log.d(TAG, sb.toString());
     }
 }

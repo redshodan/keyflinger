@@ -1,0 +1,10 @@
+alpha: 26
+num: 10
+symbols: 32: !@#$%^&*()_+-={}|:"<>?[]\;',./`~
+mods: 3: shift, ctl, alt
+directional: 6: arrows, pgup, pgdwn
+other: 4: quit, space, del, tab
+
+completeness:
+func: 12
+other: insert, backspace, home, end, 
