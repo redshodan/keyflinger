@@ -821,24 +821,28 @@ public class KeyFlinger extends InputMethodService
     {
     }
 
-    public void flingRight()
+    public void flingRight(LatinKeyboard.LatinKey key)
     {
-		Log.d("KeyFlinger", "flingRight");
+		Log.d("KeyFlinger" ,
+              "flingRight: " + key.mDLabels[LatinKeyboard.KEY_INDEX_RIGHT]);
     }
     
-    public void flingLeft()
+    public void flingLeft(LatinKeyboard.LatinKey key)
     {
-		Log.d("KeyFlinger", "flingLeft");
+		Log.d("KeyFlinger",
+              "flingLeft: " + key.mDLabels[LatinKeyboard.KEY_INDEX_LEFT]);
     }
 
-    public void flingDown()
+    public void flingDown(LatinKeyboard.LatinKey key)
     {
-		Log.d("KeyFlinger", "flingDown");
+		Log.d("KeyFlinger",
+              "flingDown: " + key.mDLabels[LatinKeyboard.KEY_INDEX_DOWN]);
     }
 
-    public void flingUp()
+    public void flingUp(LatinKeyboard.LatinKey key)
     {
-		Log.d("KeyFlinger", "flingUp");
+		Log.d("KeyFlinger",
+              "flingUp: " + key.mDLabels[LatinKeyboard.KEY_INDEX_UP]);
     }
     
 }

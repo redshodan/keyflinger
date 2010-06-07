@@ -22,7 +22,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.content.Context;
 import android.view.MotionEvent;
-//import android.view.VelocityTracker;
 import android.view.ViewConfiguration;
 import android.util.Log;
 import java.util.List;

@@ -24,11 +24,20 @@ import android.inputmethodservice.Keyboard.Key;
 import android.inputmethodservice.Keyboard.Row;
 import android.view.inputmethod.EditorInfo;
 import android.graphics.drawable.ColorDrawable;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.util.Xml;
+import java.util.List;
 
 public class LatinKeyboard extends Keyboard
 {
+    static private String TAG = "KeyFlinger";
+    static final public int KEY_INDEX_UP = 0;
+    static final public int KEY_INDEX_DOWN = 1;
+    static final public int KEY_INDEX_LEFT = 2;
+    static final public int KEY_INDEX_RIGHT = 3;
     private Key mEnterKey;
-    
+
     public LatinKeyboard(Context context, int xmlLayoutResId)
     {
         super(context, xmlLayoutResId);
@@ -95,12 +104,53 @@ public class LatinKeyboard extends Keyboard
 
     static class LatinKey extends Keyboard.Key
     {
+        public static final int MAX = 4;
+        public static final String XMLNS =
+            "http://codepunks.org/schemas/android/res/keyflinger";
+        public int[] mDCodes;
+        public String[] mDLabels;
+        
         public LatinKey(Resources res, Keyboard.Row parent, int x, int y,
                         XmlResourceParser parser)
         {
             super(res, parent, x, y, parser);
-            // label = null;
-            // icon = new ColorDrawable(0);
+
+            try
+            {
+            mDCodes = new int[MAX];
+            mDLabels = new String[MAX];
+            AttributeSet attrs = Xml.asAttributeSet(parser);
+            for (int i = 0; i < MAX; ++i)
+            {
+                String name;
+                if (i == KEY_INDEX_UP)
+                    name = "Up";
+                else if (i == KEY_INDEX_DOWN)
+                    name = "Down";
+                else if (i == KEY_INDEX_RIGHT)
+                    name = "Right";
+                else if (i == KEY_INDEX_LEFT)
+                    name = "Left";
+                else
+                    name = "";
+                mDCodes[i] = attrs.getAttributeIntValue(
+                    XMLNS, String.format("keyCode%s", name), -1000);
+                mDLabels[i] = attrs.getAttributeValue(
+                    XMLNS, String.format("keyLabel%s", name));
+                if (mDCodes[i] > -1000)
+                {
+                    Log.d(TAG, String.format("found code: %d", mDCodes[i]));
+                }
+                if (mDLabels[i] != null)
+                {
+                    Log.d(TAG, String.format("found label: %s", mDLabels[i]));
+                }
+            }
+            }
+            catch (Exception e)
+            {
+                Log.d(TAG, "Exception: " + e.toString());
+            }
         }
         
         /**

@@ -20,14 +20,19 @@
 
     <!-- android:keyHeight="@dimen/key_height" -->
 <Keyboard xmlns:android="http://schemas.android.com/apk/res/android"
-    android:keyWidth="25%p"
-    android:horizontalGap="0px"
-    android:verticalGap="0px"
-    android:keyHeight="8%p"
+          xmlns:keyflinger="http://codepunks.org/schemas/android/res/keyflinger"
+          android:keyWidth="25%p"
+          android:horizontalGap="0px"
+          android:verticalGap="0px"
+          android:keyHeight="8%p"
     >
 
     <Row>
-        <Key android:codes="49" android:keyLabel="Shift" android:keyEdgeFlags="left"/>
+        <Key android:codes="64" android:keyLabel="\@" android:keyEdgeFlags="left"
+             keyflinger:keyCodeDown="49" keyflinger:keyLabelDown="1" 
+             keyflinger:keyCodeLeft="50" keyflinger:keyLabelLeft="2"
+             keyflinger:keyCodeUp="51" keyflinger:keyLabelUp="3"
+             keyflinger:keyCodeRight="52" keyflinger:keyLabelRight="4"/>
         <Key android:codes="50" android:keyLabel="Ctl"/>
         <Key android:codes="54" android:keyLabel="Alt" android:keyEdgeFlags="right"/>
         <Key android:codes="54" android:keyLabel="Alt" android:keyEdgeFlags="right"/>
