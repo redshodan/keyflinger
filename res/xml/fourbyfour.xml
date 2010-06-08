@@ -27,35 +27,108 @@
           android:keyHeight="8%p"
     >
 
+<!--
+        keyflinger:keyCode="177" keyflinger:keyLabel="±"
+        keyflinger:keyCode="215" keyflinger:keyLabel="×"
+        keyflinger:keyCode="247" keyflinger:keyLabel="÷"
+        keyflinger:keyCode="8226" keyflinger:keyLabel="•"
+        keyflinger:keyCode="176" keyflinger:keyLabel="°"
+        keyflinger:keyCode="180" keyflinger:keyLabel="´"
+        keyflinger:keyCode="169" keyflinger:keyLabel="©"
+        keyflinger:keyCode="163" keyflinger:keyLabel="£"
+        keyflinger:keyCode="8364" keyflinger:keyLabel="€"
+        keyflinger:keyCode="174" keyflinger:keyLabel="®"
+        keyflinger:keyCode="165" keyflinger:keyLabel="¥"
+        keyflinger:keyCode="161" keyflinger:keyLabel="¡" 
+        keyflinger:keyCode="162" keyflinger:keyLabel="¢"
+        keyflinger:keyCode="191" keyflinger:keyLabel="¿"
+-->
+
     <Row>
-        <Key android:codes="64" android:keyLabel="\@" android:keyEdgeFlags="left"
-             keyflinger:keyCodeDown="49" keyflinger:keyLabelDown="1" 
-             keyflinger:keyCodeLeft="50" keyflinger:keyLabelLeft="2"
-             keyflinger:keyCodeUp="51" keyflinger:keyLabelUp="3"
-             keyflinger:keyCodeRight="52" keyflinger:keyLabelRight="4"/>
-        <Key android:codes="50" android:keyLabel="Ctl"/>
-        <Key android:codes="54" android:keyLabel="Alt" android:keyEdgeFlags="right"/>
-        <Key android:codes="54" android:keyLabel="Alt" android:keyEdgeFlags="right"/>
+        <Key android:codes="33" android:keyLabel="!"
+             keyflinger:keyCodeLeft="49" keyflinger:keyLabelLeft="1"
+             keyflinger:keyCodeUp="50" keyflinger:keyLabelUp="2"
+             keyflinger:keyCodeRight="51" keyflinger:keyLabelRight="3"
+             keyflinger:keyCodeDown="64" keyflinger:keyLabelDown="\@" 
+             android:keyEdgeFlags="left" />
+        <Key android:codes="35" android:keyLabel="\#"
+             keyflinger:keyCodeLeft="52" keyflinger:keyLabelLeft="4"
+             keyflinger:keyCodeUp="53" keyflinger:keyLabelUp="5"
+             keyflinger:keyCodeRight="54" keyflinger:keyLabelRight="6"
+             keyflinger:keyCodeDown="36" keyflinger:keyLabelDown="$"/>
+        <Key android:codes="37" android:keyLabel="%"
+             keyflinger:keyCodeLeft="55" keyflinger:keyLabelLeft="7"
+             keyflinger:keyCodeUp="56" keyflinger:keyLabelUp="8"
+             keyflinger:keyCodeRight="57" keyflinger:keyLabelRight="9"
+             keyflinger:keyCodeDown="94" keyflinger:keyLabelDown="^"/>
+        <Key android:codes="38" android:keyLabel="&amp;" 
+             keyflinger:keyCodeLeft="48" keyflinger:keyLabelLeft="0"
+             keyflinger:keyCodeUp="96" keyflinger:keyLabelUp="`"
+             keyflinger:keyCodeRight="126" keyflinger:keyLabelRight="~"
+             keyflinger:keyCodeDown="42" keyflinger:keyLabelDown="*"
+             android:keyEdgeFlags="right"/>
     </Row>
     <Row>
-        <Key android:codes="49" android:keyLabel="Shift" android:keyEdgeFlags="left"/>
-        <Key android:codes="50" android:keyLabel="Ctl"/>
-        <Key android:codes="54" android:keyLabel="Alt" android:keyEdgeFlags="right"/>
-        <Key android:codes="54" android:keyLabel="Alt" android:keyEdgeFlags="right"/>
+        <Key android:codes="101" android:keyLabel="e"
+             keyflinger:keyCodeLeft="113" keyflinger:keyLabelLeft="q"
+             keyflinger:keyCodeUp="119" keyflinger:keyLabelUp="w"
+             keyflinger:keyCodeRight="116" keyflinger:keyLabelRight="t"
+             keyflinger:keyCodeDown="114" keyflinger:keyLabelDown="r"
+             android:keyEdgeFlags="left" />
+        <Key android:codes="105" android:keyLabel="i"
+             keyflinger:keyCodeLeft="121" keyflinger:keyLabelLeft="y"
+             keyflinger:keyCodeUp="117" keyflinger:keyLabelUp="u"
+             keyflinger:keyCodeRight="112" keyflinger:keyLabelRight="p"
+             keyflinger:keyCodeDown="111" keyflinger:keyLabelDown="o"/>
+        <Key android:codes="123" android:keyLabel="{"
+             keyflinger:keyCodeLeft="91" keyflinger:keyLabelLeft="["
+             keyflinger:keyCodeUp="93" keyflinger:keyLabelUp="]" 
+             keyflinger:keyCodeRight="125" keyflinger:keyLabelRight="}"
+             keyflinger:keyCodeDown="43" keyflinger:keyLabelDown="+"/>
+        <Key android:codes="45" android:keyLabel="-"
+             keyflinger:keyCodeLeft="40" keyflinger:keyLabelLeft="("
+             keyflinger:keyCodeUp="41" keyflinger:keyLabelUp=")" 
+             keyflinger:keyCodeRight="61" keyflinger:keyLabelRight="="
+             keyflinger:keyCodeDown="95" keyflinger:keyLabelDown="_"
+             android:keyEdgeFlags="right"/>
     </Row>
     <Row>
-        <Key android:codes="49" android:keyLabel="Shift" android:keyEdgeFlags="left"/>
-        <Key android:codes="50" android:keyLabel="Ctl"/>
-        <Key android:codes="54" android:keyLabel="Alt" android:keyEdgeFlags="right"/>
-        <Key android:codes="54" android:keyLabel="Alt" android:keyEdgeFlags="right"/>
+        <Key android:codes="100" android:keyLabel="d"
+             keyflinger:keyCodeLeft="97" keyflinger:keyLabelLeft="a"
+             keyflinger:keyCodeUp="115" keyflinger:keyLabelUp="s"
+             keyflinger:keyCodeRight="102" keyflinger:keyLabelRight="f"
+             keyflinger:keyCodeDown="103" keyflinger:keyLabelDown="g"
+             android:keyEdgeFlags="left"/>
+        <Key android:codes="107" android:keyLabel="k"
+             keyflinger:keyCodeLeft="104" keyflinger:keyLabelLeft="h"
+             keyflinger:keyCodeUp="106" keyflinger:keyLabelUp="j"
+             keyflinger:keyCodeRight="108" keyflinger:keyLabelRight="l"
+             keyflinger:keyCodeDown="122" keyflinger:keyLabelDown="z"/>
+        <Key android:codes="118" android:keyLabel="v"
+             keyflinger:keyCodeLeft="120" keyflinger:keyLabelLeft="x"
+             keyflinger:keyCodeUp="99" keyflinger:keyLabelUp="c"
+             keyflinger:keyCodeRight="98" keyflinger:keyLabelRight="b"
+             keyflinger:keyCodeDown="110" keyflinger:keyLabelDown="n" />
+        <Key android:codes="92" android:keyLabel="\\" 
+             keyflinger:keyCodeLeft="109" keyflinger:keyLabelLeft="m"
+             keyflinger:keyCodeUp="124" keyflinger:keyLabelUp="|"
+             keyflinger:keyCodeRight="58" keyflinger:keyLabelRight=":"
+             keyflinger:keyCodeDown="59" keyflinger:keyLabelDown=";"
+             android:keyEdgeFlags="right"/>
     </Row>
     <Row>
         <Key android:codes="-3" android:keyIcon="@drawable/sym_keyboard_done" 
              android:keyEdgeFlags="left"/>
         <Key android:codes="10" android:keyIcon="@drawable/sym_keyboard_return"/>
         <Key android:codes="32" android:keyIcon="@drawable/sym_keyboard_space"
+             keyflinger:keyCodeLeft="63" keyflinger:keyLabelLeft="\?"
+             keyflinger:keyCodeUp="47" keyflinger:keyLabelUp="/" 
+             keyflinger:keyCodeRight="34" keyflinger:keyLabelRight="&quot;"
+             keyflinger:keyCodeDown="39" keyflinger:keyLabelDown="\'"
              android:isRepeatable="true"/>
         <Key android:codes="-5" android:keyIcon="@drawable/sym_keyboard_delete" 
+             keyflinger:keyCodeLeft="60" keyflinger:keyLabelLeft="&lt;"
+             keyflinger:keyCodeUp="62" keyflinger:keyLabelUp="&gt;"
              android:keyEdgeFlags="right" android:isRepeatable="true"/>
     </Row>
 

@@ -137,14 +137,14 @@ public class LatinKeyboard extends Keyboard
                     XMLNS, String.format("keyCode%s", name), -1000);
                 mDLabels[i] = attrs.getAttributeValue(
                     XMLNS, String.format("keyLabel%s", name));
-                if (mDCodes[i] > -1000)
-                {
-                    Log.d(TAG, String.format("found code: %d", mDCodes[i]));
-                }
-                if (mDLabels[i] != null)
-                {
-                    Log.d(TAG, String.format("found label: %s", mDLabels[i]));
-                }
+                // if (mDCodes[i] > -1000)
+                // {
+                //     Log.d(TAG, String.format("found code: %d", mDCodes[i]));
+                // }
+                // if (mDLabels[i] != null)
+                // {
+                //     Log.d(TAG, String.format("found label: %s", mDLabels[i]));
+                // }
             }
             }
             catch (Exception e)
