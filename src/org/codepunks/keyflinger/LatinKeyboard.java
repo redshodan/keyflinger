@@ -36,6 +36,9 @@ public class LatinKeyboard extends Keyboard
     static final public int KEY_INDEX_DOWN = 1;
     static final public int KEY_INDEX_LEFT = 2;
     static final public int KEY_INDEX_RIGHT = 3;
+    static final public int KEY_INDEX_MAX = 4;
+    static final public int KEYCODE_CTL = -10;
+    static final public int KEYCODE_ESC = -11;
     private Key mEnterKey;
 
     public LatinKeyboard(Context context, int xmlLayoutResId)
@@ -109,6 +112,7 @@ public class LatinKeyboard extends Keyboard
             "http://codepunks.org/schemas/android/res/keyflinger";
         public int[] mDCodes;
         public String[] mDLabels;
+        public int[][] mDOffsets;
         
         public LatinKey(Resources res, Keyboard.Row parent, int x, int y,
                         XmlResourceParser parser)
@@ -119,6 +123,7 @@ public class LatinKeyboard extends Keyboard
             {
             mDCodes = new int[MAX];
             mDLabels = new String[MAX];
+            mDOffsets = new int[MAX][2];
             AttributeSet attrs = Xml.asAttributeSet(parser);
             for (int i = 0; i < MAX; ++i)
             {
@@ -134,9 +139,13 @@ public class LatinKeyboard extends Keyboard
                 else
                     name = "";
                 mDCodes[i] = attrs.getAttributeIntValue(
-                    XMLNS, String.format("keyCode%s", name), -1000);
+                    XMLNS, String.format("key%sCode", name), -1000);
                 mDLabels[i] = attrs.getAttributeValue(
-                    XMLNS, String.format("keyLabel%s", name));
+                    XMLNS, String.format("key%sLabel", name));
+                mDOffsets[i][0] = attrs.getAttributeIntValue(
+                    XMLNS, String.format("key%sXOff", name), 0);
+                mDOffsets[i][1] = attrs.getAttributeIntValue(
+                    XMLNS, String.format("key%sYOff", name), 0);
                 // if (mDCodes[i] > -1000)
                 // {
                 //     Log.d(TAG, String.format("found code: %d", mDCodes[i]));

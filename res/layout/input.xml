@@ -25,6 +25,7 @@
    android:layout_width="fill_parent"
    android:layout_height="fill_parent"
    android:background="@android:color/transparent"
+   android:keyTextSize="12sp"
    />
    <!-- android:keyBackground="@android:color/transparent" -->
    <!-- android:layout_height="wrap_content" -->

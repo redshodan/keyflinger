@@ -37,6 +37,8 @@ public class KeyFlinger extends InputMethodService
 {
     static final boolean DEBUG = true;
 
+    public final static int KEY_ESCAPE = 27;
+
     private LatinKeyboardView mInputView;
     private CandidateView mCandidateView;
     private CompletionInfo[] mCompletions;
@@ -59,6 +61,7 @@ public class KeyFlinger extends InputMethodService
 
     private ExtractView mEview;
     private boolean mIgnoreNextKey = false;
+    private boolean mIsControlSet = false;
     
     /**
      * Main initialization of the input method component.  Be sure to call
@@ -582,6 +585,14 @@ public class KeyFlinger extends InputMethodService
         {
             // Show a menu or somethin'
         }
+        else if (primaryCode == LatinKeyboard.KEYCODE_CTL)
+        {
+            mIsControlSet = !mIsControlSet;
+        }
+        else if (primaryCode == LatinKeyboard.KEYCODE_ESC)
+        {
+            handleCharacter(KEY_ESCAPE, keyCodes);
+        }
         else if ((primaryCode == Keyboard.KEYCODE_MODE_CHANGE) &&
                  (mInputView != null))
         {
@@ -701,20 +712,20 @@ public class KeyFlinger extends InputMethodService
             checkToggleCapsLock();
             mInputView.setShifted(mCapsLock || !mInputView.isShifted());
         }
-        else if (currentKeyboard == m4x4Keyboard)
-        {
-            m4x4Keyboard.setShifted(true);
-            mInputView.setKeyboard(m4x4ShiftedKeyboard);
-            m4x4ShiftedKeyboard.setShifted(true);
-        }
-        else if (currentKeyboard == m4x4ShiftedKeyboard)
-        {
-            m4x4ShiftedKeyboard.setShifted(false);
-            mInputView.setKeyboard(m4x4Keyboard);
-            m4x4Keyboard.setShifted(false);
-        }
+        // else if (currentKeyboard == m4x4Keyboard)
+        // {
+        //     m4x4Keyboard.setShifted(true);
+        //     mInputView.setKeyboard(m4x4ShiftedKeyboard);
+        //     m4x4ShiftedKeyboard.setShifted(true);
+        // }
+        // else if (currentKeyboard == m4x4ShiftedKeyboard)
+        // {
+        //     m4x4ShiftedKeyboard.setShifted(false);
+        //     mInputView.setKeyboard(m4x4Keyboard);
+        //     m4x4Keyboard.setShifted(false);
+        // }
     }
-    
+
     private void handleCharacter(int primaryCode, int[] keyCodes)
     {
         if (isInputViewShown())
@@ -733,9 +744,23 @@ public class KeyFlinger extends InputMethodService
         }
         else
         {
+            if (mIsControlSet)
+            {
+                // Support CTRL-a through CTRL-z
+                if (primaryCode >= 0x61 && primaryCode <= 0x7A)
+                    primaryCode -= 0x60;
+                // Support CTRL-A through CTRL-_
+                else if (primaryCode >= 0x41 && primaryCode <= 0x5F)
+                    primaryCode -= 0x40;
+                else if (primaryCode == 0x20)
+                    primaryCode = 0x00;
+                else if (primaryCode == 0x3F)
+                    primaryCode = 0x7F;
+            }
             getCurrentInputConnection().commitText(
                 String.valueOf((char) primaryCode), 1);
         }
+        mIsControlSet = false;
     }
 
     private void handleClose()

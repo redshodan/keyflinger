@@ -17,12 +17,23 @@
 package org.codepunks.keyflinger;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
 import android.inputmethodservice.Keyboard.Key;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.Rect;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.graphics.Paint.Align;
+import android.graphics.Region.Op;
 import android.view.MotionEvent;
 import android.util.AttributeSet;
 import android.util.Log;
+
 import java.util.List;
 import java.util.Arrays;
 
@@ -39,28 +50,49 @@ public class LatinKeyboardView extends KeyboardView
     private int travelY = 10;
 
     // Copied from android.inputmethodservice.Keyboard
-    private static final int NOT_A_KEY = -1;
+    private static final int NOT_A_KEY = -1000;
     private LatinKeyboard mKeyboard;
     private LatinKeyboard.LatinKey[] mKeys;
     private int mProximityThreshold;
     private static int MAX_NEARBY_KEYS = 12;
     private int[] mDistances = new int[MAX_NEARBY_KEYS];
     private int mDownKey = NOT_A_KEY;
-
+    private boolean mKeyboardChanged;
+    private boolean mDrawPending;
+    private Bitmap mBuffer;
+    private Canvas mCanvas;
+    private Rect mDrawRect;
+    private Rect mTextRect;
+    private Paint mPaint;
+        
     public LatinKeyboardView(Context context, AttributeSet attrs)
     {
         super(context, attrs);
-        initKeyFlinging();
-        mThis = this;
-        setPreviewEnabled(false);
+        Log.d(TAG, "cons 1");
+        setup(context, attrs);
     }
 
     public LatinKeyboardView(Context context, AttributeSet attrs, int defStyle)
     {
         super(context, attrs, defStyle);
+        Log.d(TAG, "cons 2");
+        setup(context, attrs);
+    }
+
+    protected void setup(Context context, AttributeSet attrs)
+    {
+        Log.d(TAG, "setup");
+
         initKeyFlinging();
         mThis = this;
         setPreviewEnabled(false);
+
+        mPaint = new Paint();
+        mPaint.setAntiAlias(true);
+        mPaint.setAlpha(255);
+
+        mDrawRect = new Rect();
+        mTextRect = new Rect();
     }
 
     public void setKeyFlinger(KeyFlinger kf)
@@ -84,6 +116,11 @@ public class LatinKeyboardView extends KeyboardView
                     float deltaX = e.up.getX(idx) - e.down.getX(idx);
                     float deltaY = e.up.getY(idx) - e.down.getY(idx);
                     int code = NOT_A_KEY;
+                    if (mDownKey == NOT_A_KEY)
+                    {
+                        Log.d(TAG, "Passing in onFling. Bad key.");
+                        return false;
+                    }
                     if ((absY < absX) && (deltaX > travelX))
                     {
                         mKeyFlinger.flingRight(mKeys[mDownKey]);
@@ -178,7 +215,151 @@ public class LatinKeyboardView extends KeyboardView
         Log.d(TAG, sb.toString());
     }
 
-    // Copied from android.inputmethodservice.Keyboard
+    /*
+     * Copied from android.inputmethodservice.Keyboard to get at bits that are
+     * needed.
+     */
+
+    @Override public void onSizeChanged(int w, int h, int oldw, int oldh)
+    {
+        super.onSizeChanged(w, h, oldw, oldh);
+        // Release the buffer, if any and it will be reallocated on the next draw
+        mBuffer = null;
+    }
+    
+    @Override public void closing()
+    {
+        mBuffer = null;
+        mCanvas = null;
+        super.closing();
+    }
+
+    public void invalidateAllKeys()
+    {
+        mDrawPending = true;
+        super.invalidateAllKeys();
+    }
+
+    protected CharSequence adjustCase(CharSequence label)
+    {
+        if (mKeyboard.isShifted() && (label != null) && (label.length() < 3) &&
+            Character.isLowerCase(label.charAt(0)))
+        {
+            label = label.toString().toUpperCase();
+        }
+        return label;
+    }
+
+    @Override public void onDraw(Canvas canvas)
+    {
+        super.onDraw(canvas);
+        if (mDrawPending || (mBuffer == null) || mKeyboardChanged)
+        {
+            onBufferDraw();
+        }
+        canvas.drawBitmap(mBuffer, 0, 0, null);
+    }
+
+    protected void onBufferDraw()
+    {
+        Log.d("KeyFlinger", "onBufferDraw()");
+        if (mBuffer == null || mKeyboardChanged)
+        {
+            if ((mBuffer == null) || mKeyboardChanged &&
+                (mBuffer.getWidth() != getWidth()) ||
+                (mBuffer.getHeight() != getHeight()))
+            {
+                mBuffer = Bitmap.createBitmap(getWidth(), getHeight(),
+                                              Bitmap.Config.ARGB_8888);
+                mCanvas = new Canvas(mBuffer);
+            }
+            invalidateAllKeys();
+            mKeyboardChanged = false;
+        }
+
+        final Canvas canvas = mCanvas;
+        mDrawRect.set(0, 0, getWidth(), getHeight());
+        canvas.clipRect(mDrawRect, Op.REPLACE);
+        
+        if (mKeyboard == null)
+        {
+            return;
+        }
+        
+        final Paint paint = mPaint;
+        final Key[] keys = mKeys;
+        final int keyCount = keys.length;
+        final int padding = (int)paint.getFontMetrics(null) / 2;
+
+        paint.setTextSize(12);
+        paint.setTextAlign(Paint.Align.LEFT);
+        paint.setTypeface(Typeface.DEFAULT);
+        paint.setColor(0xFFFFFFFF);
+        canvas.drawColor(0x00000000, PorterDuff.Mode.CLEAR);
+
+        for (int i = 0; i < keyCount; i++)
+        {
+            final LatinKeyboard.LatinKey key = (LatinKeyboard.LatinKey)keys[i];
+            String label = null;
+            int x = 0;
+            int y = 0;
+
+            canvas.translate(key.x + getPaddingLeft(),
+                             key.y + getPaddingTop());
+
+            for (int j = 0; j < LatinKeyboard.KEY_INDEX_MAX; ++j)
+            {
+                if (key.mDLabels[j] == null)
+                {
+                    continue;
+                }
+                
+                if (j == LatinKeyboard.KEY_INDEX_UP)
+                {
+                    label = adjustCase(key.mDLabels[j]).toString();
+                    paint.getTextBounds(label, 0, label.length(), mTextRect);
+                    x = key.width / 4 + key.mDOffsets[j][0];
+                    y = Math.abs(mTextRect.top) + Math.abs(mTextRect.bottom) +
+                        padding + key.mDOffsets[j][1];
+                }
+                else if (j == LatinKeyboard.KEY_INDEX_DOWN)
+                {
+                    label = adjustCase(key.mDLabels[j]).toString();
+                    paint.getTextBounds(label, 0, label.length(), mTextRect);
+                    x = key.width * 3 / 4 - Math.abs(mTextRect.right) +
+                        key.mDOffsets[j][0];
+                    y = key.height /*- Math.abs(mTextRect.bottom)*/ - padding +
+                        key.mDOffsets[j][1];
+                }
+                else if (j == LatinKeyboard.KEY_INDEX_LEFT)
+                {
+                    label = adjustCase(key.mDLabels[j]).toString();
+                    paint.getTextBounds(label, 0, label.length(), mTextRect);
+                    x = 5 + key.mDOffsets[j][0];
+                    y = (int)(key.height / 2 +
+                              (paint.getTextSize() - paint.descent()) / 2) +
+                        key.mDOffsets[j][1];
+                }
+                else if (j == LatinKeyboard.KEY_INDEX_RIGHT)
+                {
+                    label = adjustCase(key.mDLabels[j]).toString();
+                    paint.getTextBounds(label, 0, label.length(), mTextRect);
+                    x = key.width - 5 - Math.abs(mTextRect.right) +
+                        key.mDOffsets[j][0];
+                    y = (int)(key.height / 2 +
+                              (paint.getTextSize() - paint.descent()) / 2) +
+                        key.mDOffsets[j][1];
+                }
+                canvas.drawText(label, x, y, paint);
+            }
+
+            canvas.translate(- key.x - getPaddingLeft(),
+                             - key.y - getPaddingTop());
+        }
+
+        mDrawPending = false;
+    }
+
     @Override public void setKeyboard(Keyboard keyboard)
     {
         mKeyboard = (LatinKeyboard)keyboard;
@@ -195,10 +376,12 @@ public class LatinKeyboardView extends KeyboardView
         if (dimensionSum < 0 || length == 0) return;
         mProximityThreshold = (int) (dimensionSum * 1.4f / length);
         mProximityThreshold *= mProximityThreshold; // Square it
+        mKeyboardChanged = true;
         super.setKeyboard(keyboard);
     }
     
-    protected int getKeyIndices(int x, int y, int[] allKeys) {
+    protected int getKeyIndices(int x, int y, int[] allKeys)
+    {
         final Key[] keys = mKeys;
         int closestKey = NOT_A_KEY;
         int primaryIndex = NOT_A_KEY;
@@ -206,25 +389,34 @@ public class LatinKeyboardView extends KeyboardView
         java.util.Arrays.fill(mDistances, Integer.MAX_VALUE);
         int [] nearestKeyIndices = mKeyboard.getNearestKeys(x, y);
         final int keyCount = nearestKeyIndices.length;
-        for (int i = 0; i < keyCount; i++) {
+        for (int i = 0; i < keyCount; i++)
+        {
             final Key key = keys[nearestKeyIndices[i]];
             int dist = 0;
             boolean isInside = key.isInside(x,y);
-            if (((isProximityCorrectionEnabled()
-                  && (dist = key.squaredDistanceFrom(x, y)) < mProximityThreshold) 
-                 || isInside)
-                && key.codes[0] > 32) {
+            if (((isProximityCorrectionEnabled() &&
+                  ((dist = key.squaredDistanceFrom(x, y)) <
+                   mProximityThreshold)) ||
+                 isInside) &&
+                (key.codes[0] > 32))
+            {
                 // Find insertion point
                 final int nCodes = key.codes.length;
-                if (dist < closestKeyDist) {
+                if (dist < closestKeyDist)
+                {
                     closestKeyDist = dist;
                     closestKey = nearestKeyIndices[i];
                 }
                 
-                if (allKeys == null) continue;
+                if (allKeys == null)
+                {
+                    continue;
+                }
                 
-                for (int j = 0; j < mDistances.length; j++) {
-                    if (mDistances[j] > dist) {
+                for (int j = 0; j < mDistances.length; j++)
+                {
+                    if (mDistances[j] > dist)
+                    {
                         // Make space for nCodes codes
                         System.arraycopy(mDistances, j, mDistances, j + nCodes,
                                          mDistances.length - j - nCodes);
@@ -239,38 +431,31 @@ public class LatinKeyboardView extends KeyboardView
                 }
             }
             
-            if (isInside) {
+            if (isInside)
+            {
                 primaryIndex = nearestKeyIndices[i];
             }
         }
-        if (primaryIndex == NOT_A_KEY) {
+        if (primaryIndex == NOT_A_KEY)
+        {
             primaryIndex = closestKey;
         }
         return primaryIndex;
     }
 
-    protected void detectAndSendKey(int index, int code /*, int x, int y*/) {
-        if (index != NOT_A_KEY && index < mKeys.length) {
+    protected void detectAndSendKey(int index, int code)
+    {
+        if (index != NOT_A_KEY && index < mKeys.length)
+        {
             final Key key = mKeys[index];
-            if (key.text != null) {
+            if (key.text != null)
+            {
                 getOnKeyboardActionListener().onText(key.text);
                 getOnKeyboardActionListener().onRelease(NOT_A_KEY);
-            } else {
-                //TextEntryState.keyPressedAt(key, x, y);
-                // int[] codes = new int[MAX_NEARBY_KEYS];
-                // Arrays.fill(codes, NOT_A_KEY);
-                // getKeyIndices(x, y, codes);
-                // Multi-tap
-                // if (mInMultiTap) {
-                //     if (mTapCount != -1) {
-                //         getOnKeyboardActionListener().onKey(
-                //             Keyboard.KEYCODE_DELETE, KEY_DELETE);
-                //     } else {
-                //         mTapCount = 0;
-                //     }
-                //     code = key.codes[mTapCount];
-                // }
-                getOnKeyboardActionListener().onKey(code, null /*codes*/);
+            }
+            else
+            {
+                getOnKeyboardActionListener().onKey(code, null);
                 getOnKeyboardActionListener().onRelease(code);
             }
         }
