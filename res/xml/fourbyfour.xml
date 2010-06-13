@@ -127,19 +127,21 @@
              keyflinger:keyLeftYOff="7"
              keyflinger:keyUpCode="-10" keyflinger:keyUpLabel="ctl"
              keyflinger:keyUpXOff="-2"
-             keyflinger:keyRightCode="-11" keyflinger:keyRightLabel="esc"/>
+             keyflinger:keyRightCode="-11" keyflinger:keyRightLabel="esc"
+             keyflinger:keyDownCode="9" keyflinger:keyDownLabel="tab"
+             />
         <Key android:codes="32" android:keyIcon="@drawable/sym_keyboard_space"
              keyflinger:keyLeftCode="63" keyflinger:keyLeftLabel="\?"
              keyflinger:keyUpCode="47" keyflinger:keyUpLabel="/" 
              keyflinger:keyRightCode="34" keyflinger:keyRightLabel="&quot;"
              keyflinger:keyDownCode="39" keyflinger:keyDownLabel="\'"
-             android:isRepeatable="true"/>
+             android:isRepeatable="false"/>
         <Key android:codes="-5" android:keyIcon="@drawable/sym_keyboard_delete" 
              keyflinger:keyLeftCode="60" keyflinger:keyLeftLabel="&lt;"
              keyflinger:keyUpCode="62" keyflinger:keyUpLabel="&gt;"
              keyflinger:keyRightCode="44" keyflinger:keyRightLabel=","
              keyflinger:keyDownCode="46" keyflinger:keyDownLabel="."
-             android:keyEdgeFlags="right" android:isRepeatable="true"/>
+             android:keyEdgeFlags="right" android:isRepeatable="false"/>
     </Row>
 
 </Keyboard>
