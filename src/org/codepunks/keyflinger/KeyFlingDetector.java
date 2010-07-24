@@ -288,6 +288,15 @@ public class KeyFlingDetector
         }
     }
 
+    public void setParams(int touchSlop, int doubleTapSlop, int minFlingVelocity,
+                          boolean longPressEnabled)
+    {
+        mTouchSlopSquare = touchSlop;
+        mDoubleTapSlopSquare = doubleTapSlop;
+        mMinimumFlingVelocity = minFlingVelocity;
+        mIsLongpressEnabled = longPressEnabled;
+    }
+    
     public void setOnDoubleTapListener(OnDoubleTapListener onDoubleTapListener)
     {
         mDoubleTapListener = onDoubleTapListener;

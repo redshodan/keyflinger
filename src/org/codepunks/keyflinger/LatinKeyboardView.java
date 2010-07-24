@@ -460,4 +460,11 @@ public class LatinKeyboardView extends KeyboardView
             }
         }
     }
+
+    public void setParams(int touchSlop, int doubleTapSlop, int minFlingVelocity,
+                          boolean longPressEnabled)
+    {
+        mFlingDetector.setParams(touchSlop, doubleTapSlop, minFlingVelocity,
+                                 longPressEnabled);
+    }
 }

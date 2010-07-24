@@ -16,6 +16,8 @@
 
 package org.codepunks.keyflinger;
 
+import android.preference.PreferenceManager;
+import android.content.SharedPreferences;
 import android.inputmethodservice.InputMethodService;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
@@ -36,6 +38,7 @@ public class KeyFlinger extends InputMethodService
         implements KeyboardView.OnKeyboardActionListener
 {
     static final boolean DEBUG = true;
+    static final String TAG = "KeyFlinger";
 
     public final static int KEY_ESCAPE = 27;
 
@@ -69,7 +72,7 @@ public class KeyFlinger extends InputMethodService
      */
     @Override public void onCreate()
     {
-		Log.d("KeyFlinger", "onCreate");
+		Log.d(TAG, "onCreate");
         super.onCreate();
         mWordSeparators = getResources().getString(R.string.word_separators);
     }
@@ -144,7 +147,7 @@ public class KeyFlinger extends InputMethodService
      */
     @Override public void onStartInput(EditorInfo attribute, boolean restarting)
     {
-		Log.d("KeyFlinger", "onStartInput");
+		Log.d(TAG, "onStartInput");
         super.onStartInput(attribute, restarting);
         
         // Reset our state.  We want to do this even if restarting, because
@@ -269,6 +272,7 @@ public class KeyFlinger extends InputMethodService
         // Apply the selected keyboard to the input view.
         mInputView.setKeyboard(mCurKeyboard);
         mInputView.closing();
+        loadPrefs();
     }
     
     /**
@@ -848,26 +852,43 @@ public class KeyFlinger extends InputMethodService
 
     public void flingRight(LatinKeyboard.LatinKey key)
     {
-		Log.d("KeyFlinger" ,
+		Log.d(TAG ,
               "flingRight: " + key.mDLabels[LatinKeyboard.KEY_INDEX_RIGHT]);
     }
     
     public void flingLeft(LatinKeyboard.LatinKey key)
     {
-		Log.d("KeyFlinger",
+		Log.d(TAG,
               "flingLeft: " + key.mDLabels[LatinKeyboard.KEY_INDEX_LEFT]);
     }
 
     public void flingDown(LatinKeyboard.LatinKey key)
     {
-		Log.d("KeyFlinger",
+		Log.d(TAG,
               "flingDown: " + key.mDLabels[LatinKeyboard.KEY_INDEX_DOWN]);
     }
 
     public void flingUp(LatinKeyboard.LatinKey key)
     {
-		Log.d("KeyFlinger",
+		Log.d(TAG,
               "flingUp: " + key.mDLabels[LatinKeyboard.KEY_INDEX_UP]);
     }
-    
+
+    protected void loadPrefs()
+    {
+        SharedPreferences sp =
+            PreferenceManager.getDefaultSharedPreferences(this);
+        int ts = Integer.parseInt(sp.getString("touchSlop", "10"));
+        int dts = Integer.parseInt(sp.getString("doubleTapSlop", "100"));
+        int mfs = Integer.parseInt(sp.getString("minFlingVelocity", "5"));
+        boolean lp = sp.getBoolean("longpress", true);
+        int ilp = 1;
+        if (!lp)
+        {
+            ilp = 0;
+        }
+        Log.d(TAG, String.format("config: ts=%d dts=%d mfs=%d lp=%d", ts, dts,
+                                 mfs, ilp));
+        mInputView.setParams(ts, dts, mfs, lp);
+    }
 }
