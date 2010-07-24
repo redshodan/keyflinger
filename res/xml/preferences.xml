@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<CheckBoxPreference
+		android:key="abool"
+		android:title="@string/pref_abool_title"
+		android:summary="@string/pref_abool_summary"
+		android:defaultValue="true"
+		/>
+
+</PreferenceScreen>

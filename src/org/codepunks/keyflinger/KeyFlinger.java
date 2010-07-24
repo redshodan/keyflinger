@@ -89,7 +89,7 @@ public class KeyFlinger extends InputMethodService
             if (displayWidth == mLastDisplayWidth) return;
             mLastDisplayWidth = displayWidth;
         }
-        mFlingMTKeyboard = new LatinKeyboard(this, R.xml.qwerty);
+        mFlingMTKeyboard = new LatinKeyboard(this, R.xml.multitouch);
         m4x4Keyboard = new LatinKeyboard(this, R.xml.fourbyfour);
         m4x4ShiftedKeyboard = new LatinKeyboard(this, R.xml.fourbyfourshifted);
     }
@@ -822,27 +822,27 @@ public class KeyFlinger extends InputMethodService
         }
     }
     
-    public void swipeRight()
+    @Override public void swipeRight()
     {
     }
     
-    public void swipeLeft()
+    @Override public void swipeLeft()
     {
     }
 
-    public void swipeDown()
+    @Override public void swipeDown()
     {
     }
 
-    public void swipeUp()
+    @Override public void swipeUp()
     {
     }
     
-    public void onPress(int primaryCode)
+    @Override public void onPress(int primaryCode)
     {
     }
     
-    public void onRelease(int primaryCode)
+    @Override public void onRelease(int primaryCode)
     {
     }
 
