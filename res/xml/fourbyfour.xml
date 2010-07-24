@@ -121,6 +121,8 @@
     </Row>
     <Row>
         <Key android:codes="-3" android:keyIcon="@drawable/sym_keyboard_done" 
+             keyflinger:keyUpCode="-2" keyflinger:keyUpLabel="mode"
+             keyflinger:keyUpYOff="-3"
              android:keyEdgeFlags="left"/>
         <Key android:codes="10" android:keyIcon="@drawable/sym_keyboard_return"
              keyflinger:keyLeftCode="-1" keyflinger:keyLeftLabel="shift"
