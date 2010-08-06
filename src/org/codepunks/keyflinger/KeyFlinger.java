@@ -1,4 +1,19 @@
 /*
+ * Copyright (C) 2010 James Newton
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+/*
  * Copyright (C) 2008-2009 Google Inc.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -65,7 +80,6 @@ public class KeyFlinger extends InputMethodService
     
     private LatinKeyboard mFlingMTKeyboard;
     private LatinKeyboard m4x4Keyboard;
-    private LatinKeyboard m4x4ShiftedKeyboard;
     
     private LatinKeyboard mCurKeyboard;
     
@@ -102,7 +116,6 @@ public class KeyFlinger extends InputMethodService
         }
         mFlingMTKeyboard = new LatinKeyboard(this, R.xml.multitouch);
         m4x4Keyboard = new LatinKeyboard(this, R.xml.fourbyfour);
-        m4x4ShiftedKeyboard = new LatinKeyboard(this, R.xml.fourbyfourshifted);
     }
     
     /**
@@ -345,11 +358,11 @@ public class KeyFlinger extends InputMethodService
             return false;
         }
         
-//        boolean dead = false;
+        // boolean dead = false;
       
         if ((c & KeyCharacterMap.COMBINING_ACCENT) != 0)
         {
-//            dead = true;
+            // dead = true;
             c = c & KeyCharacterMap.COMBINING_ACCENT_MASK;
         }
         
@@ -607,8 +620,7 @@ public class KeyFlinger extends InputMethodService
                  (mInputView != null))
         {
             Keyboard current = mInputView.getKeyboard();
-            if ((current == m4x4Keyboard) ||
-                (current == m4x4ShiftedKeyboard))
+            if (current == m4x4Keyboard)
             {
                 current = mFlingMTKeyboard;
             }
@@ -722,18 +734,6 @@ public class KeyFlinger extends InputMethodService
             checkToggleCapsLock();
             mInputView.setShifted(mCapsLock || !mInputView.isShifted());
         }
-        // else if (currentKeyboard == m4x4Keyboard)
-        // {
-        //     m4x4Keyboard.setShifted(true);
-        //     mInputView.setKeyboard(m4x4ShiftedKeyboard);
-        //     m4x4ShiftedKeyboard.setShifted(true);
-        // }
-        // else if (currentKeyboard == m4x4ShiftedKeyboard)
-        // {
-        //     m4x4ShiftedKeyboard.setShifted(false);
-        //     mInputView.setKeyboard(m4x4Keyboard);
-        //     m4x4Keyboard.setShifted(false);
-        // }
     }
 
     private void handleCharacter(int primaryCode, int[] keyCodes)
