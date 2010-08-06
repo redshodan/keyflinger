@@ -6,7 +6,7 @@
 		android:key="longpress"
 		android:title="@string/pref_longpress_title"
 		android:summary="@string/pref_longpress_summary"
-		android:defaultValue="true"
+		android:defaultValue="false"
 		/>
 
 	<EditTextPreference

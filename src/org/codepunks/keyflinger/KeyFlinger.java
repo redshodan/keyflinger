@@ -16,11 +16,11 @@
 
 package org.codepunks.keyflinger;
 
-import android.preference.PreferenceManager;
 import android.content.SharedPreferences;
 import android.inputmethodservice.InputMethodService;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
+import android.preference.PreferenceManager;
 import android.text.method.MetaKeyKeyListener;
 import android.util.Log;
 import android.view.KeyCharacterMap;
@@ -29,7 +29,6 @@ import android.view.View;
 import android.view.inputmethod.CompletionInfo;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
-import android.view.inputmethod.InputMethodManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +40,16 @@ public class KeyFlinger extends InputMethodService
     static final String TAG = "KeyFlinger";
 
     public final static int KEY_ESCAPE = 27;
+
+    /**
+     * This boolean indicates the optional example code for performing
+     * processing of hard keys in addition to regular text generation
+     * from on-screen interaction.  It would be used for input methods that
+     * perform language translations (such as converting text entered on 
+     * a QWERTY keyboard to Chinese), but may not be used for input methods
+     * that are primarily intended to be used for on-screen text entry.
+     */
+    static final boolean PROCESS_HARD_KEYS = true;
 
     private LatinKeyboardView mInputView;
     private CandidateView mCandidateView;
@@ -62,7 +71,6 @@ public class KeyFlinger extends InputMethodService
     
     private String mWordSeparators;
 
-    private ExtractView mEview;
     private boolean mIgnoreNextKey = false;
     private boolean mIsControlSet = false;
     
@@ -123,15 +131,6 @@ public class KeyFlinger extends InputMethodService
         mCandidateView = new CandidateView(this);
         mCandidateView.setService(this);
         return mCandidateView;
-    }
-
-    @Override public View onCreateExtractTextView()
-    {
-        if (mEview == null)
-        {
-            mEview = new ExtractView(this);
-        }
-        return mEview;
     }
 
     // @Override public boolean onEvaluateFullscreenMode()
@@ -333,39 +332,43 @@ public class KeyFlinger extends InputMethodService
      * InputConnection.  It is only needed when using the
      * PROCESS_HARD_KEYS option.
      */
-    /*
-      private boolean translateKeyDown(int keyCode, KeyEvent event) {
-      mMetaState = MetaKeyKeyListener.handleKeyDown(mMetaState,
-      keyCode, event);
-      int c = event.getUnicodeChar(MetaKeyKeyListener.getMetaState(mMetaState));
-      mMetaState = MetaKeyKeyListener.adjustMetaAfterKeypress(mMetaState);
-      InputConnection ic = getCurrentInputConnection();
-      if (c == 0 || ic == null) {
-      return false;
-      }
+    private boolean translateKeyDown(int keyCode, KeyEvent event)
+    {
+        mMetaState = MetaKeyKeyListener.handleKeyDown(mMetaState,
+                                                      keyCode, event);
+        int c =
+            event.getUnicodeChar(MetaKeyKeyListener.getMetaState(mMetaState));
+        mMetaState = MetaKeyKeyListener.adjustMetaAfterKeypress(mMetaState);
+        InputConnection ic = getCurrentInputConnection();
+        if (c == 0 || ic == null)
+        {
+            return false;
+        }
         
-      boolean dead = false;
-
-      if ((c & KeyCharacterMap.COMBINING_ACCENT) != 0) {
-      dead = true;
-      c = c & KeyCharacterMap.COMBINING_ACCENT_MASK;
-      }
+//        boolean dead = false;
+      
+        if ((c & KeyCharacterMap.COMBINING_ACCENT) != 0)
+        {
+//            dead = true;
+            c = c & KeyCharacterMap.COMBINING_ACCENT_MASK;
+        }
         
-      if (mComposing.length() > 0) {
-      char accent = mComposing.charAt(mComposing.length() -1 );
-      int composed = KeyEvent.getDeadChar(accent, c);
-
-      if (composed != 0) {
-      c = composed;
-      mComposing.setLength(mComposing.length()-1);
-      }
-      }
+        if (mComposing.length() > 0)
+        {
+            char accent = mComposing.charAt(mComposing.length() -1 );
+            int composed = KeyEvent.getDeadChar(accent, c);
+            
+            if (composed != 0)
+            {
+                c = composed;
+                mComposing.setLength(mComposing.length()-1);
+            }
+        }
         
-      onKey(c, null);
+        onKey(c, null);
         
-      return true;
-      }
-    */
+        return true;
+    }
     
     /**
      * Use this to monitor key events being delivered to the application.
@@ -405,37 +408,40 @@ public class KeyFlinger extends InputMethodService
             // Let the underlying text editor always handle these.
             return false;
                 
-            //default:
+        default:
             // For all other keys, if we want to do transformations on
             // text being entered with a hard keyboard, we need to process
             // it and do the appropriate action.
-            /*
-              if (PROCESS_HARD_KEYS) {
-              if (keyCode == KeyEvent.KEYCODE_SPACE
-              && (event.getMetaState()&KeyEvent.META_ALT_ON) != 0) {
-              // A silly example: in our input method, Alt+Space
-              // is a shortcut for 'android' in lower case.
-              InputConnection ic = getCurrentInputConnection();
-              if (ic != null) {
-              // First, tell the editor that it is no longer in the
-              // shift state, since we are consuming this.
-              ic.clearMetaKeyStates(KeyEvent.META_ALT_ON);
-              keyDownUp(KeyEvent.KEYCODE_A);
-              keyDownUp(KeyEvent.KEYCODE_N);
-              keyDownUp(KeyEvent.KEYCODE_D);
-              keyDownUp(KeyEvent.KEYCODE_R);
-              keyDownUp(KeyEvent.KEYCODE_O);
-              keyDownUp(KeyEvent.KEYCODE_I);
-              keyDownUp(KeyEvent.KEYCODE_D);
-              // And we consume this event.
-              return true;
-              }
-              }
-              if (mPredictionOn && translateKeyDown(keyCode, event)) {
-              return true;
-              }
-              }
-            */
+
+            if (PROCESS_HARD_KEYS)
+            {
+                if ((keyCode == KeyEvent.KEYCODE_SPACE) &&
+                    ((event.getMetaState() & KeyEvent.META_ALT_ON) != 0))
+                {
+                    // A silly example: in our input method, Alt+Space
+                    // is a shortcut for 'android' in lower case.
+                    InputConnection ic = getCurrentInputConnection();
+                    if (ic != null)
+                    {
+                        // First, tell the editor that it is no longer in the
+                        // shift state, since we are consuming this.
+                        ic.clearMetaKeyStates(KeyEvent.META_ALT_ON);
+                        keyDownUp(KeyEvent.KEYCODE_A);
+                        keyDownUp(KeyEvent.KEYCODE_N);
+                        keyDownUp(KeyEvent.KEYCODE_D);
+                        keyDownUp(KeyEvent.KEYCODE_R);
+                        keyDownUp(KeyEvent.KEYCODE_O);
+                        keyDownUp(KeyEvent.KEYCODE_I);
+                        keyDownUp(KeyEvent.KEYCODE_D);
+                        // And we consume this event.
+                        return true;
+                    }
+                }
+                if (mPredictionOn && translateKeyDown(keyCode, event))
+                {
+                    return true;
+                }
+            }
         }
         
         return super.onKeyDown(keyCode, event);
@@ -446,22 +452,22 @@ public class KeyFlinger extends InputMethodService
      * We get first crack at them, and can either resume them or let them
      * continue to the app.
      */
-    // @Override public boolean onKeyUp(int keyCode, KeyEvent event)
-    // {
-    //     // If we want to do transformations on text being entered with a hard
-    //     // keyboard, we need to process the up events to update the meta key
-    //     // state we are tracking.
-    //     if (PROCESS_HARD_KEYS)
-    //     {
-    //         if (mPredictionOn)
-    //         {
-    //             mMetaState = MetaKeyKeyListener.handleKeyUp(mMetaState,
-    //                                                         keyCode, event);
-    //         }
-    //     }
+    @Override public boolean onKeyUp(int keyCode, KeyEvent event)
+    {
+        // If we want to do transformations on text being entered with a hard
+        // keyboard, we need to process the up events to update the meta key
+        // state we are tracking.
+        if (PROCESS_HARD_KEYS)
+        {
+            if (mPredictionOn)
+            {
+                mMetaState = MetaKeyKeyListener.handleKeyUp(mMetaState,
+                                                            keyCode, event);
+            }
+        }
         
-    //     return super.onKeyUp(keyCode, event);
-    // }
+        return super.onKeyUp(keyCode, event);
+    }
 
     /**
      * Helper function to commit any text being composed in to the editor.
@@ -664,20 +670,20 @@ public class KeyFlinger extends InputMethodService
     public void setSuggestions(List<String> suggestions, boolean completions,
                                boolean typedWordValid)
     {
-        //setCandidatesViewShown(false);
-        if (suggestions != null && suggestions.size() > 0)
-        {
-            setCandidatesViewShown(true);
-        }
-        else if (isExtractViewShown())
-        {
-            setCandidatesViewShown(true);
-        }
-        if (mCandidateView != null)
-        {
-            mCandidateView.setSuggestions(suggestions, completions,
-                                          typedWordValid);
-        }
+        setCandidatesViewShown(false);
+        // if (suggestions != null && suggestions.size() > 0)
+        // {
+        //     setCandidatesViewShown(true);
+        // }
+        // else if (isExtractViewShown())
+        // {
+        //     setCandidatesViewShown(true);
+        // }
+        // if (mCandidateView != null)
+        // {
+        //     mCandidateView.setSuggestions(suggestions, completions,
+        //                                   typedWordValid);
+        // }
     }
     
     private void handleBackspace()
@@ -881,7 +887,7 @@ public class KeyFlinger extends InputMethodService
         int ts = Integer.parseInt(sp.getString("touchSlop", "10"));
         int dts = Integer.parseInt(sp.getString("doubleTapSlop", "100"));
         int mfs = Integer.parseInt(sp.getString("minFlingVelocity", "5"));
-        boolean lp = sp.getBoolean("longpress", true);
+        boolean lp = sp.getBoolean("longpress", false);
         int ilp = 1;
         if (!lp)
         {

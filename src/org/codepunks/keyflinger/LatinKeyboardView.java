@@ -17,7 +17,6 @@
 package org.codepunks.keyflinger;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
 import android.inputmethodservice.Keyboard.Key;
@@ -27,15 +26,12 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
-import android.graphics.Paint.Align;
 import android.graphics.Region.Op;
 import android.view.MotionEvent;
 import android.util.AttributeSet;
 import android.util.Log;
 
 import java.util.List;
-import java.util.Arrays;
 
 
 public class LatinKeyboardView extends KeyboardView
@@ -43,7 +39,6 @@ public class LatinKeyboardView extends KeyboardView
     static final String TAG = "KeyFlinger";
     static final int KEYCODE_OPTIONS = -100;
 
-    private LatinKeyboardView mThis;
     private KeyFlinger mKeyFlinger;
     private KeyFlingDetector mFlingDetector;
     private int travelX = 10;
@@ -84,7 +79,6 @@ public class LatinKeyboardView extends KeyboardView
         Log.d(TAG, "setup");
 
         initKeyFlinging();
-        mThis = this;
         setPreviewEnabled(false);
 
         mPaint = new Paint();
@@ -186,7 +180,8 @@ public class LatinKeyboardView extends KeyboardView
         return super.onTouchEvent(e);
     }
 
-    private void dumpEvent(MotionEvent event)
+    @SuppressWarnings("unused")
+	private void dumpEvent(MotionEvent event)
     {
         String names[] = { "DOWN" , "UP" , "MOVE" , "CANCEL" , "OUTSIDE" ,
                            "POINTER_DOWN" , "POINTER_UP" , "7?" , "8?" , "9?" };
