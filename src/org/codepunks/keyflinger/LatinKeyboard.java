@@ -132,40 +132,42 @@ public class LatinKeyboard extends Keyboard
 
             try
             {
-            mDCodes = new int[MAX];
-            mDLabels = new String[MAX];
-            mDOffsets = new int[MAX][2];
-            AttributeSet attrs = Xml.asAttributeSet(parser);
-            for (int i = 0; i < MAX; ++i)
-            {
-                String name;
-                if (i == KEY_INDEX_UP)
-                    name = "Up";
-                else if (i == KEY_INDEX_DOWN)
-                    name = "Down";
-                else if (i == KEY_INDEX_RIGHT)
-                    name = "Right";
-                else if (i == KEY_INDEX_LEFT)
-                    name = "Left";
-                else
-                    name = "";
-                mDCodes[i] = attrs.getAttributeIntValue(
-                    XMLNS, String.format("key%sCode", name), -1000);
-                mDLabels[i] = attrs.getAttributeValue(
-                    XMLNS, String.format("key%sLabel", name));
-                mDOffsets[i][0] = attrs.getAttributeIntValue(
-                    XMLNS, String.format("key%sXOff", name), 0);
-                mDOffsets[i][1] = attrs.getAttributeIntValue(
-                    XMLNS, String.format("key%sYOff", name), 0);
-                // if (mDCodes[i] > -1000)
-                // {
-                //     Log.d(TAG, String.format("found code: %d", mDCodes[i]));
-                // }
-                // if (mDLabels[i] != null)
-                // {
-                //     Log.d(TAG, String.format("found label: %s", mDLabels[i]));
-                // }
-            }
+                mDCodes = new int[MAX];
+                mDLabels = new String[MAX];
+                mDOffsets = new int[MAX][2];
+                AttributeSet attrs = Xml.asAttributeSet(parser);
+                for (int i = 0; i < MAX; ++i)
+                {
+                    String name;
+                    if (i == KEY_INDEX_UP)
+                    {
+                        name = "Up";
+                    }
+                    else if (i == KEY_INDEX_DOWN)
+                    {
+                        name = "Down";
+                    }
+                    else if (i == KEY_INDEX_RIGHT)
+                    {
+                        name = "Right";
+                    }
+                    else if (i == KEY_INDEX_LEFT)
+                    {
+                        name = "Left";
+                    }
+                    else
+                    {
+                        name = "";
+                    }
+                    mDCodes[i] = attrs.getAttributeIntValue(
+                        XMLNS, String.format("key%sCode", name), -1000);
+                    mDLabels[i] = attrs.getAttributeValue(
+                        XMLNS, String.format("key%sLabel", name));
+                    mDOffsets[i][0] = attrs.getAttributeIntValue(
+                        XMLNS, String.format("key%sXOff", name), 0);
+                    mDOffsets[i][1] = attrs.getAttributeIntValue(
+                        XMLNS, String.format("key%sYOff", name), 0);
+                }
             }
             catch (Exception e)
             {

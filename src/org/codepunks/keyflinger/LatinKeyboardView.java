@@ -43,8 +43,10 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.Region.Op;
 import android.view.MotionEvent;
+import android.view.WindowManager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.DisplayMetrics;
 
 import java.util.List;
 
@@ -74,25 +76,22 @@ public class LatinKeyboardView extends KeyboardView
     private Rect mDrawRect;
     private Rect mTextRect;
     private Paint mPaint;
-        
+    private DisplayMetrics mMetrics;
+    
     public LatinKeyboardView(Context context, AttributeSet attrs)
     {
         super(context, attrs);
-        Log.d(TAG, "cons 1");
         setup(context, attrs);
     }
 
     public LatinKeyboardView(Context context, AttributeSet attrs, int defStyle)
     {
         super(context, attrs, defStyle);
-        Log.d(TAG, "cons 2");
         setup(context, attrs);
     }
 
     protected void setup(Context context, AttributeSet attrs)
     {
-        Log.d(TAG, "setup");
-
         initKeyFlinging();
         setPreviewEnabled(false);
 
@@ -102,6 +101,10 @@ public class LatinKeyboardView extends KeyboardView
 
         mDrawRect = new Rect();
         mTextRect = new Rect();
+
+        mMetrics = new DisplayMetrics();
+        ((WindowManager)getContext().getSystemService(Context.WINDOW_SERVICE))
+            .getDefaultDisplay().getMetrics(mMetrics);
     }
 
     public void setKeyFlinger(KeyFlinger kf)
@@ -299,9 +302,20 @@ public class LatinKeyboardView extends KeyboardView
         final Paint paint = mPaint;
         final Key[] keys = mKeys;
         final int keyCount = keys.length;
-        final int padding = (int)paint.getFontMetrics(null) / 2;
+        final double padding = paint.getFontMetrics(null) / 2.0;
+        final double scale = mMetrics.scaledDensity;
 
-        paint.setTextSize(12);
+        Log.d(TAG, String.format("density=%f scaledDensity=%f",
+                                 mMetrics.density, scale));
+
+        double tsize = 12.0 * scale;
+        if (tsize - (int)tsize > 0.0)
+        {
+            tsize = tsize + 1;
+        }
+        Log.d(TAG, String.format("tsize=%d", (int)tsize));
+                                 
+        paint.setTextSize((int)tsize);
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTypeface(Typeface.DEFAULT);
         paint.setColor(0xFFFFFFFF);
@@ -311,8 +325,8 @@ public class LatinKeyboardView extends KeyboardView
         {
             final LatinKeyboard.LatinKey key = (LatinKeyboard.LatinKey)keys[i];
             String label = null;
-            int x = 0;
-            int y = 0;
+            double x = 0;
+            double y = 0;
 
             canvas.translate(key.x + getPaddingLeft(),
                              key.y + getPaddingTop());
@@ -324,43 +338,36 @@ public class LatinKeyboardView extends KeyboardView
                     continue;
                 }
                 
+                label = adjustCase(key.mDLabels[j]).toString();
+                paint.getTextBounds(label, 0, label.length(), mTextRect);
                 if (j == LatinKeyboard.KEY_INDEX_UP)
                 {
-                    label = adjustCase(key.mDLabels[j]).toString();
-                    paint.getTextBounds(label, 0, label.length(), mTextRect);
-                    x = key.width / 4 + key.mDOffsets[j][0];
+                    x = key.width / 4.0 + key.mDOffsets[j][0] * scale;
                     y = Math.abs(mTextRect.top) + Math.abs(mTextRect.bottom) +
-                        padding + key.mDOffsets[j][1];
+                        padding + key.mDOffsets[j][1] * scale;
                 }
                 else if (j == LatinKeyboard.KEY_INDEX_DOWN)
                 {
-                    label = adjustCase(key.mDLabels[j]).toString();
-                    paint.getTextBounds(label, 0, label.length(), mTextRect);
-                    x = key.width * 3 / 4 - Math.abs(mTextRect.right) +
-                        key.mDOffsets[j][0];
-                    y = key.height /*- Math.abs(mTextRect.bottom)*/ - padding +
-                        key.mDOffsets[j][1];
+                    x = key.width * 3.0 / 4.0 - Math.abs(mTextRect.right) +
+                        key.mDOffsets[j][0] * scale;
+                    y = key.height - padding + key.mDOffsets[j][1] * scale;
                 }
                 else if (j == LatinKeyboard.KEY_INDEX_LEFT)
                 {
-                    label = adjustCase(key.mDLabels[j]).toString();
-                    paint.getTextBounds(label, 0, label.length(), mTextRect);
-                    x = 5 + key.mDOffsets[j][0];
-                    y = (int)(key.height / 2 +
-                              (paint.getTextSize() - paint.descent()) / 2) +
-                        key.mDOffsets[j][1];
+                    x = 5.0 * scale + key.mDOffsets[j][0] * scale;
+                    y = key.height / 2 +
+                        (paint.getTextSize() - paint.descent()) / 2.0 +
+                        key.mDOffsets[j][1] * scale;
                 }
                 else if (j == LatinKeyboard.KEY_INDEX_RIGHT)
                 {
-                    label = adjustCase(key.mDLabels[j]).toString();
-                    paint.getTextBounds(label, 0, label.length(), mTextRect);
-                    x = key.width - 5 - Math.abs(mTextRect.right) +
-                        key.mDOffsets[j][0];
-                    y = (int)(key.height / 2 +
-                              (paint.getTextSize() - paint.descent()) / 2) +
-                        key.mDOffsets[j][1];
+                    x = key.width - 5.0 * scale - Math.abs(mTextRect.right) +
+                        key.mDOffsets[j][0] * scale;
+                    y = key.height / 2.0 +
+                        (paint.getTextSize() - paint.descent()) / 2.0 +
+                        key.mDOffsets[j][1] * scale;
                 }
-                canvas.drawText(label, x, y, paint);
+                canvas.drawText(label, Math.round(x), Math.round(y), paint);
             }
 
             canvas.translate(- key.x - getPaddingLeft(),
@@ -383,7 +390,10 @@ public class LatinKeyboardView extends KeyboardView
             Key key = mKeys[i];
             dimensionSum += Math.min(key.width, key.height) + key.gap;
         }
-        if (dimensionSum < 0 || length == 0) return;
+        if ((dimensionSum < 0) || (length == 0))
+        {
+            return;
+        }
         mProximityThreshold = (int) (dimensionSum * 1.4f / length);
         mProximityThreshold *= mProximityThreshold; // Square it
         mKeyboardChanged = true;
