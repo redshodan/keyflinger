@@ -36,7 +36,6 @@
 */
 -->
 
-    <!-- android:keyHeight="@dimen/key_height" -->
 <Keyboard xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:keyflinger="http://codepunks.org/schemas/android/res/keyflinger"
           android:keyWidth="25%p"
@@ -45,41 +44,32 @@
           android:keyHeight="9%p"
     >
 
-<!--
-        keyflinger:keyCode="177" keyflinger:keyLabel="±"
-        keyflinger:keyCode="215" keyflinger:keyLabel="×"
-        keyflinger:keyCode="247" keyflinger:keyLabel="÷"
-        keyflinger:keyCode="8226" keyflinger:keyLabel="•"
-        keyflinger:keyCode="176" keyflinger:keyLabel="°"
-        keyflinger:keyCode="180" keyflinger:keyLabel="´"
-        keyflinger:keyCode="169" keyflinger:keyLabel="©"
-        keyflinger:keyCode="163" keyflinger:keyLabel="£"
-        keyflinger:keyCode="8364" keyflinger:keyLabel="€"
-        keyflinger:keyCode="174" keyflinger:keyLabel="®"
-        keyflinger:keyCode="165" keyflinger:keyLabel="¥"
-        keyflinger:keyCode="161" keyflinger:keyLabel="¡" 
-        keyflinger:keyCode="162" keyflinger:keyLabel="¢"
-        keyflinger:keyCode="191" keyflinger:keyLabel="¿"
--->
-
     <Row>
         <Key android:codes="33" android:keyLabel="!"
+             android:popupCharacters="¡¿"
+             android:popupKeyboard="@xml/popup"
              keyflinger:keyLeftCode="49" keyflinger:keyLeftLabel="1"
              keyflinger:keyUpCode="50" keyflinger:keyUpLabel="2"
              keyflinger:keyRightCode="51" keyflinger:keyRightLabel="3"
              keyflinger:keyDownCode="64" keyflinger:keyDownLabel="\@" 
              android:keyEdgeFlags="left" />
         <Key android:codes="35" android:keyLabel="\#"
+             android:popupCharacters="©£®¥¢"
+             android:popupKeyboard="@xml/popup"
              keyflinger:keyLeftCode="52" keyflinger:keyLeftLabel="4"
              keyflinger:keyUpCode="53" keyflinger:keyUpLabel="5"
              keyflinger:keyRightCode="54" keyflinger:keyRightLabel="6"
              keyflinger:keyDownCode="36" keyflinger:keyDownLabel="$"/>
         <Key android:codes="37" android:keyLabel="%"
+             android:popupCharacters="•°´"
+             android:popupKeyboard="@xml/popup"
              keyflinger:keyLeftCode="55" keyflinger:keyLeftLabel="7"
              keyflinger:keyUpCode="56" keyflinger:keyUpLabel="8"
              keyflinger:keyRightCode="57" keyflinger:keyRightLabel="9"
              keyflinger:keyDownCode="94" keyflinger:keyDownLabel="^"/>
         <Key android:codes="38" android:keyLabel="&amp;" 
+             android:popupCharacters="±×÷"
+             android:popupKeyboard="@xml/popup"
              keyflinger:keyLeftCode="48" keyflinger:keyLeftLabel="0"
              keyflinger:keyUpCode="96" keyflinger:keyUpLabel="`"
              keyflinger:keyUpYOff="-5"
@@ -155,13 +145,13 @@
              keyflinger:keyUpCode="47" keyflinger:keyUpLabel="/" 
              keyflinger:keyRightCode="34" keyflinger:keyRightLabel="&quot;"
              keyflinger:keyDownCode="39" keyflinger:keyDownLabel="\'"
-             android:isRepeatable="false"/>
+             android:isRepeatable="true"/>
         <Key android:codes="-5" android:keyIcon="@drawable/sym_keyboard_delete" 
              keyflinger:keyLeftCode="60" keyflinger:keyLeftLabel="&lt;"
              keyflinger:keyUpCode="62" keyflinger:keyUpLabel="&gt;"
              keyflinger:keyRightCode="44" keyflinger:keyRightLabel=","
              keyflinger:keyDownCode="46" keyflinger:keyDownLabel="."
-             android:keyEdgeFlags="right" android:isRepeatable="false"/>
+             android:keyEdgeFlags="right" android:isRepeatable="true"/>
     </Row>
 
 </Keyboard>

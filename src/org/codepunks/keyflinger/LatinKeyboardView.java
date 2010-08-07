@@ -43,6 +43,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.Region.Op;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.WindowManager;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -70,6 +71,7 @@ public class LatinKeyboardView extends KeyboardView
     private int[] mDistances = new int[MAX_NEARBY_KEYS];
     private int mDownKey = NOT_A_KEY;
     private boolean mKeyboardChanged;
+    private boolean mMiniKeyboardOnScreen = false;
     private boolean mDrawPending;
     private Bitmap mBuffer;
     private Canvas mCanvas;
@@ -168,9 +170,20 @@ public class LatinKeyboardView extends KeyboardView
             });
     }
 
+    public void onClick(View v)
+    {
+        mMiniKeyboardOnScreen = false;
+        super.onClick(v);
+    }
+
+    public boolean handleBack()
+    {
+        mMiniKeyboardOnScreen = false;
+        return super.handleBack();
+    }
+    
     @Override protected boolean onLongPress(Key key)
     {
-        Log.d(TAG, "LKV::onLongPress");
         if (key.codes[0] == Keyboard.KEYCODE_CANCEL)
         {
             getOnKeyboardActionListener().onKey(KEYCODE_OPTIONS, null);
@@ -178,6 +191,10 @@ public class LatinKeyboardView extends KeyboardView
         }
         else
         {
+            if (key.popupResId != 0)
+            {
+                mMiniKeyboardOnScreen = true;
+            }
             return super.onLongPress(key);
         }
     }
@@ -244,6 +261,7 @@ public class LatinKeyboardView extends KeyboardView
     {
         mBuffer = null;
         mCanvas = null;
+        mMiniKeyboardOnScreen = false;
         super.closing();
     }
 
@@ -318,7 +336,14 @@ public class LatinKeyboardView extends KeyboardView
         paint.setTextSize((int)tsize);
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTypeface(Typeface.DEFAULT);
-        paint.setColor(0xFFFFFFFF);
+        if (mMiniKeyboardOnScreen)
+        {
+            paint.setColor(0xAAAAAAAA);
+        }
+        else
+        {
+            paint.setColor(0xFFFFFFFF);
+        }
         canvas.drawColor(0x00000000, PorterDuff.Mode.CLEAR);
 
         for (int i = 0; i < keyCount; i++)
