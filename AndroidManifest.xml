@@ -5,7 +5,7 @@
 
   <application android:label="@string/ime_name">
 
-    <service android:name="KeyFlinger"
+    <service android:name=".KeyFlinger"
              android:permission="android.permission.BIND_INPUT_METHOD">
       <intent-filter>
         <action android:name="android.view.InputMethod" />
@@ -13,7 +13,7 @@
       <meta-data android:name="android.view.im" android:resource="@xml/method" />
     </service>
 
-    <activity android:name="KeyFlingerSettings" android:label="KeyFlinger Settings">
+    <activity android:name=".KeyFlingerSettings" android:label="KeyFlinger Settings">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
       </intent-filter>

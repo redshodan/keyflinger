@@ -49,7 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class KeyFlinger extends InputMethodService 
-        implements KeyboardView.OnKeyboardActionListener
+    implements KeyboardView.OnKeyboardActionListener
 {
     static final boolean DEBUG = true;
     static final String TAG = "KeyFlinger";
@@ -79,7 +79,7 @@ public class KeyFlinger extends InputMethodService
     private long mMetaState;
     
     private LatinKeyboard mFlingMTKeyboard;
-    private LatinKeyboard m4x4Keyboard;
+    private LatinKeyboard mQwertyKeyboard;
     
     private LatinKeyboard mCurKeyboard;
     
@@ -87,7 +87,13 @@ public class KeyFlinger extends InputMethodService
 
     private boolean mIgnoreNextKey = false;
     private boolean mIsControlSet = false;
-    
+
+    // Public config info
+    public boolean mLongPressEnabled = true;
+    public int mTouchSlop = 10;
+    public int mDoubleTapSlop = 100;
+    public int mMinFlingVelocity = 5;
+
     /**
      * Main initialization of the input method component.  Be sure to call
      * to super class.
@@ -98,14 +104,14 @@ public class KeyFlinger extends InputMethodService
         super.onCreate();
         mWordSeparators = getResources().getString(R.string.word_separators);
     }
-    
+
     /**
      * This is the point where you can do all of your UI initialization.  It
      * is called after creation and any configuration change.
      */
     @Override public void onInitializeInterface()
     {
-        if (m4x4Keyboard != null)
+        if (mQwertyKeyboard != null)
         {
             // Configuration changes can happen after the keyboard gets
             // recreated, so we need to be able to re-build the keyboards if the
@@ -114,8 +120,8 @@ public class KeyFlinger extends InputMethodService
             if (displayWidth == mLastDisplayWidth) return;
             mLastDisplayWidth = displayWidth;
         }
-        mFlingMTKeyboard = new LatinKeyboard(this, R.xml.multitouch);
-        m4x4Keyboard = new LatinKeyboard(this, R.xml.fourbyfour);
+        mFlingMTKeyboard = new LatinKeyboard(this, R.xml.kb_multitouch);
+        mQwertyKeyboard = new LatinKeyboard(this, R.xml.kb_qwerty);
     }
     
     /**
@@ -130,7 +136,7 @@ public class KeyFlinger extends InputMethodService
             (LatinKeyboardView) getLayoutInflater().inflate(R.layout.input,
                                                             null);
         mInputView.setOnKeyboardActionListener(this);
-        mInputView.setKeyboard(m4x4Keyboard);
+        mInputView.setKeyboard(mQwertyKeyboard);
         mInputView.setKeyFlinger(this);
         return mInputView;
     }
@@ -185,13 +191,13 @@ public class KeyFlinger extends InputMethodService
         case EditorInfo.TYPE_CLASS_DATETIME:
             // Numbers and dates default to the symbols keyboard, with
             // no extra features.
-            mCurKeyboard = m4x4Keyboard;
+            mCurKeyboard = mQwertyKeyboard;
             break;
                 
         case EditorInfo.TYPE_CLASS_PHONE:
             // Phones will also default to the symbols keyboard, though
             // often you will want to have a dedicated phone keyboard.
-            mCurKeyboard = m4x4Keyboard;
+            mCurKeyboard = mQwertyKeyboard;
             break;
                 
         case EditorInfo.TYPE_CLASS_TEXT:
@@ -199,7 +205,7 @@ public class KeyFlinger extends InputMethodService
             // normal alphabetic keyboard, and assume that we should
             // be doing predictive text (showing candidates as the
             // user types).
-            mCurKeyboard = m4x4Keyboard;
+            mCurKeyboard = mQwertyKeyboard;
             mPredictionOn = true;
                 
             // We now look for a few special variations of text that will
@@ -243,7 +249,7 @@ public class KeyFlinger extends InputMethodService
         default:
             // For all unknown input types, default to the alphabetic
             // keyboard with no special features.
-            mCurKeyboard = m4x4Keyboard;
+            mCurKeyboard = mQwertyKeyboard;
             updateShiftKeyState(attribute);
         }
         
@@ -270,7 +276,7 @@ public class KeyFlinger extends InputMethodService
         // its window.
         setCandidatesViewShown(false);
         
-        mCurKeyboard = m4x4Keyboard;
+        mCurKeyboard = mQwertyKeyboard;
         if (mInputView != null)
         {
             mInputView.closing();
@@ -286,7 +292,7 @@ public class KeyFlinger extends InputMethodService
         mInputView.closing();
         loadPrefs();
     }
-    
+
     /**
      * Deal with the editor reporting movement of its cursor.
      */
@@ -503,7 +509,7 @@ public class KeyFlinger extends InputMethodService
     {
         if ((attr != null) &&
             (mInputView != null) &&
-            (m4x4Keyboard == mInputView.getKeyboard()))
+            (mQwertyKeyboard == mInputView.getKeyboard()))
         {
             int caps = 0;
             EditorInfo ei = getCurrentInputEditorInfo();
@@ -620,16 +626,16 @@ public class KeyFlinger extends InputMethodService
                  (mInputView != null))
         {
             Keyboard current = mInputView.getKeyboard();
-            if (current == m4x4Keyboard)
+            if (current == mQwertyKeyboard)
             {
                 current = mFlingMTKeyboard;
             }
             else
             {
-                current = m4x4Keyboard;
+                current = mQwertyKeyboard;
             }
             mInputView.setKeyboard(current);
-            if (current == m4x4Keyboard)
+            if (current == mQwertyKeyboard)
             {
                 current.setShifted(false);
             }
@@ -728,7 +734,7 @@ public class KeyFlinger extends InputMethodService
         }
         
         Keyboard currentKeyboard = mInputView.getKeyboard();
-        if (m4x4Keyboard == currentKeyboard)
+        if (mQwertyKeyboard == currentKeyboard)
         {
             // Alphabet keyboard
             checkToggleCapsLock();
@@ -832,27 +838,27 @@ public class KeyFlinger extends InputMethodService
         }
     }
     
-    @Override public void swipeRight()
+    public void swipeRight()
     {
     }
     
-    @Override public void swipeLeft()
+    public void swipeLeft()
     {
     }
 
-    @Override public void swipeDown()
+    public void swipeDown()
     {
     }
 
-    @Override public void swipeUp()
+    public void swipeUp()
     {
     }
     
-    @Override public void onPress(int primaryCode)
+    public void onPress(int primaryCode)
     {
     }
     
-    @Override public void onRelease(int primaryCode)
+    public void onRelease(int primaryCode)
     {
     }
 
@@ -883,18 +889,41 @@ public class KeyFlinger extends InputMethodService
     protected void loadPrefs()
     {
         SharedPreferences sp =
-            PreferenceManager.getDefaultSharedPreferences(this);
-        int ts = Integer.parseInt(sp.getString("touchSlop", "10"));
-        int dts = Integer.parseInt(sp.getString("doubleTapSlop", "100"));
-        int mfs = Integer.parseInt(sp.getString("minFlingVelocity", "5"));
-        boolean lp = sp.getBoolean("longpress", false);
+            PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+
+        try
+        {
+            mLongPressEnabled = sp.getBoolean("longpress", true);
+            mTouchSlop = Integer.parseInt(sp.getString("touchSlop", "10"));
+            mDoubleTapSlop = Integer.parseInt(sp.getString("doubleTapSlop", "100"));
+            mMinFlingVelocity =
+                Integer.parseInt(sp.getString("minFlingVelocity", "5"));
+        }
+        catch (ClassCastException e)
+        {
+            Log.d(TAG, "loadPrefs: failed");
+            defaultPrefs();
+        }
         int ilp = 1;
-        if (!lp)
+        if (!mLongPressEnabled)
         {
             ilp = 0;
         }
-        Log.d(TAG, String.format("config: ts=%d dts=%d mfs=%d lp=%d", ts, dts,
-                                 mfs, ilp));
-        mInputView.setParams(ts, dts, mfs, lp);
+        Log.d(TAG, String.format("config: ts=%d dts=%d mfs=%d lp=%d", mTouchSlop,
+                                 mDoubleTapSlop, mMinFlingVelocity, ilp));
+        if (mInputView != null)
+        {
+            mInputView.setParams(mTouchSlop, mDoubleTapSlop, mMinFlingVelocity,
+                                 mLongPressEnabled);
+        }
+    }
+
+    protected void defaultPrefs()
+    {
+        Log.d(TAG, "Setting default prefs");
+        mLongPressEnabled = true;
+        mTouchSlop = 10;
+        mDoubleTapSlop = 100;
+        mMinFlingVelocity = 5;
     }
 }

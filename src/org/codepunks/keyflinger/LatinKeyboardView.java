@@ -184,19 +184,23 @@ public class LatinKeyboardView extends KeyboardView
     
     @Override protected boolean onLongPress(Key key)
     {
-        if (key.codes[0] == Keyboard.KEYCODE_CANCEL)
+        if (mKeyFlinger.mLongPressEnabled)
         {
-            getOnKeyboardActionListener().onKey(KEYCODE_OPTIONS, null);
-            return true;
-        }
-        else
-        {
-            if (key.popupResId != 0)
+            if (key.codes[0] == Keyboard.KEYCODE_CANCEL)
             {
-                mMiniKeyboardOnScreen = true;
+                getOnKeyboardActionListener().onKey(KEYCODE_OPTIONS, null);
+                return true;
             }
-            return super.onLongPress(key);
+            else
+            {
+                if (key.popupResId != 0)
+                {
+                    mMiniKeyboardOnScreen = true;
+                }
+                return super.onLongPress(key);
+            }
         }
+        return false;
     }
 
     @Override public boolean onTouchEvent(MotionEvent e)
@@ -293,7 +297,6 @@ public class LatinKeyboardView extends KeyboardView
 
     protected void onBufferDraw()
     {
-        Log.d("KeyFlinger", "onBufferDraw()");
         if (mBuffer == null || mKeyboardChanged)
         {
             if ((mBuffer == null) || mKeyboardChanged &&
@@ -323,16 +326,11 @@ public class LatinKeyboardView extends KeyboardView
         final double padding = paint.getFontMetrics(null) / 2.0;
         final double scale = mMetrics.scaledDensity;
 
-        Log.d(TAG, String.format("density=%f scaledDensity=%f",
-                                 mMetrics.density, scale));
-
         double tsize = 12.0 * scale;
         if (tsize - (int)tsize > 0.0)
         {
             tsize = tsize + 1;
         }
-        Log.d(TAG, String.format("tsize=%d", (int)tsize));
-                                 
         paint.setTextSize((int)tsize);
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTypeface(Typeface.DEFAULT);

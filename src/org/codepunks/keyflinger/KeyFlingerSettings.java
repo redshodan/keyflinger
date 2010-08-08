@@ -16,14 +16,41 @@
 
 package org.codepunks.keyflinger;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
+import android.util.Log;
 
 public class KeyFlingerSettings extends PreferenceActivity
 {
+    static final String TAG = "KeyFlinger";
+
 	@Override protected void onCreate(Bundle savedInstanceState)
     {
 		super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.preferences);
+        
+        try
+        {
+            addPreferencesFromResource(R.xml.preferences);
+        }
+        catch (ClassCastException e)
+        {
+            Log.d(TAG, "Failed to load preferences, setting to defaults");
+            SharedPreferences sp = // getSharedPreferences(PREFS_NAME, 0);
+                PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+            SharedPreferences.Editor editor = sp.edit();
+            editor.clear();
+            editor.commit();
+
+            editor = sp.edit();
+            editor.putBoolean("longpress", true);
+            editor.putInt("touchSlop", 10);
+            editor.putInt("doubleTapSlop", 100);
+            editor.putInt("minFlingVelocity", 5);
+            editor.commit();
+
+            addPreferencesFromResource(R.xml.preferences);
+        }
 	}
 }

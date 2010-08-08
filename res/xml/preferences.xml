@@ -20,35 +20,35 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-	<CheckBoxPreference
-		android:key="longpress"
-		android:title="@string/pref_longpress_title"
-		android:summary="@string/pref_longpress_summary"
-		android:defaultValue="false"
-		/>
-
-	<EditTextPreference
-	   android:key="touchSlop"
-	   android:title="@string/pref_touchslop_title"
-	   android:summary="@string/pref_touchslop_summary"
-	   android:defaultValue="10"
-	   android:numeric="integer"
-	   />
-
-	<EditTextPreference
-	   android:key="doubleTapSlop"
-	   android:title="@string/pref_doubletapslop_title"
-	   android:summary="@string/pref_doubletapslop_summary"
-	   android:defaultValue="100"
-	   android:numeric="integer"
-	   />
-
-	<EditTextPreference
-	   android:key="minFlingVelocity"
-	   android:title="@string/pref_minflingvelocity_title"
-	   android:summary="@string/pref_minflingvelocity_summary"
-	   android:defaultValue="5"
-	   android:numeric="integer"
-	   />
-
+  <CheckBoxPreference
+     android:key="longpress"
+     android:title="@string/pref_longpress_title"
+     android:summary="@string/pref_longpress_summary"
+     android:defaultValue="true"
+     />
+  
+  <EditTextPreference
+     android:key="touchSlop"
+     android:title="@string/pref_touchslop_title"
+     android:summary="@string/pref_touchslop_summary"
+     android:defaultValue="10"
+     android:numeric="integer"
+     />
+  
+  <EditTextPreference
+     android:key="doubleTapSlop"
+     android:title="@string/pref_doubletapslop_title"
+     android:summary="@string/pref_doubletapslop_summary"
+     android:defaultValue="100"
+     android:numeric="integer"
+     />
+  
+  <EditTextPreference
+     android:key="minFlingVelocity"
+     android:title="@string/pref_minflingvelocity_title"
+     android:summary="@string/pref_minflingvelocity_summary"
+     android:defaultValue="5"
+     android:numeric="integer"
+     />
+  
 </PreferenceScreen>

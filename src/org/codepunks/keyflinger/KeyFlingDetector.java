@@ -220,7 +220,10 @@ public class KeyFlingDetector
                 break;
                 
             case LONG_PRESS:
-                dispatchLongPress(mFling, mIdx, mPid);
+                if (mIsLongpressEnabled)
+                {
+                    dispatchLongPress(mFling, mIdx, mPid);
+                }
                 break;
                 
             case TAP:
