@@ -37,7 +37,7 @@ public class KeyFlingerSettings extends PreferenceActivity
         catch (ClassCastException e)
         {
             Log.d(TAG, "Failed to load preferences, setting to defaults");
-            SharedPreferences sp = // getSharedPreferences(PREFS_NAME, 0);
+            SharedPreferences sp =
                 PreferenceManager.getDefaultSharedPreferences(getBaseContext());
             SharedPreferences.Editor editor = sp.edit();
             editor.clear();

@@ -184,4 +184,9 @@ public class LatinKeyboard extends Keyboard
             return super.isInside(x, codes[0] == KEYCODE_CANCEL ? y - 10 : y);
         }
     }
+
+    public boolean isShiftable()
+    {
+        return true;
+    }
 }

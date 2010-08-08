@@ -30,8 +30,19 @@
     <string name="label_send_key">Send</string>
 
     <!-- Preferences -->
+    <string-array name="pref_keyboard_entries">
+      <item>QWERTY</item>
+      <item>Single Touch</item>
+      <item>Multi Touch</item>
+    </string-array>
+    <string-array name="pref_keyboard_values">
+      <item>kb_qwerty</item>
+      <item>kb_singletouch</item>
+      <item>kb_multitouch</item>
+    </string-array>
+    <string name="pref_keyboard_title">Keyboard Type</string>
     <string name="pref_longpress_title">Mini Keyboard</string>
-    <string name="pref_longpress_summary">Enables mini-keyboard with alternate characters</string>
+    <string name="pref_longpress_summary">Enables popup keyboard with alternate characters</string>
     <string name="pref_touchslop_title">Touch slop size</string>
     <string name="pref_touchslop_summary">Slop size for touch detection</string>
     <string name="pref_doubletapslop_title">Double tap slop size</string>

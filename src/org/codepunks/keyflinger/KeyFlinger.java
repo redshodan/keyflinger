@@ -32,6 +32,7 @@
 package org.codepunks.keyflinger;
 
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.inputmethodservice.InputMethodService;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
@@ -47,6 +48,8 @@ import android.view.inputmethod.InputConnection;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 public class KeyFlinger extends InputMethodService 
     implements KeyboardView.OnKeyboardActionListener
@@ -55,7 +58,8 @@ public class KeyFlinger extends InputMethodService
     static final String TAG = "KeyFlinger";
 
     public final static int KEY_ESCAPE = 27;
-
+    public final static String DEF_KEYBOARD_NAME = "kb_qwerty";
+    
     /**
      * This boolean indicates the optional example code for performing
      * processing of hard keys in addition to regular text generation
@@ -78,10 +82,17 @@ public class KeyFlinger extends InputMethodService
     private long mLastShiftTime;
     private long mMetaState;
     
-    private LatinKeyboard mFlingMTKeyboard;
-    private LatinKeyboard mQwertyKeyboard;
-    
+    private LatinKeyboard[] mKeyboards = new LatinKeyboard[3];
+    private Map<String,LatinKeyboard> mKeyboardMap;
+    private int[] mKeyboardResList =
+    {
+       R.xml.kb_qwerty,
+       R.xml.kb_singletouch,
+       R.xml.kb_multitouch
+    };
+    private Map<String,Integer> mKeyboardResMap;
     private LatinKeyboard mCurKeyboard;
+    private EditorInfo mInputAttribute;
     
     private String mWordSeparators;
 
@@ -89,6 +100,7 @@ public class KeyFlinger extends InputMethodService
     private boolean mIsControlSet = false;
 
     // Public config info
+    public String mKeyboardName = DEF_KEYBOARD_NAME;
     public boolean mLongPressEnabled = true;
     public int mTouchSlop = 10;
     public int mDoubleTapSlop = 100;
@@ -102,7 +114,26 @@ public class KeyFlinger extends InputMethodService
     {
 		Log.d(TAG, "onCreate");
         super.onCreate();
-        mWordSeparators = getResources().getString(R.string.word_separators);
+
+        Resources res = getResources();
+        mWordSeparators = res.getString(R.string.word_separators);
+
+        mKeyboardResMap = new HashMap<String,Integer>();
+        for (int i = 0; i < mKeyboardResList.length; ++i)
+        {
+            int r = mKeyboardResList[i];
+            mKeyboardResMap.put(res.getResourceEntryName(r), r);
+        }
+
+        mKeyboardMap = new HashMap<String,LatinKeyboard>();
+        for (int i = 0; i < mKeyboardResList.length; ++i)
+        {
+            int r = mKeyboardResList[i];
+            mKeyboards[i] = new LatinKeyboard(this, r);
+            mKeyboardMap.put(res.getResourceEntryName(r), mKeyboards[i]);
+        }
+
+        setConfigedKeyboard();
     }
 
     /**
@@ -111,17 +142,18 @@ public class KeyFlinger extends InputMethodService
      */
     @Override public void onInitializeInterface()
     {
-        if (mQwertyKeyboard != null)
+        if (mKeyboards[0] != null)
         {
             // Configuration changes can happen after the keyboard gets
             // recreated, so we need to be able to re-build the keyboards if the
             // available space has changed.
             int displayWidth = getMaxWidth();
-            if (displayWidth == mLastDisplayWidth) return;
+            if (displayWidth == mLastDisplayWidth)
+            {
+                return;
+            }
             mLastDisplayWidth = displayWidth;
         }
-        mFlingMTKeyboard = new LatinKeyboard(this, R.xml.kb_multitouch);
-        mQwertyKeyboard = new LatinKeyboard(this, R.xml.kb_qwerty);
     }
     
     /**
@@ -136,8 +168,8 @@ public class KeyFlinger extends InputMethodService
             (LatinKeyboardView) getLayoutInflater().inflate(R.layout.input,
                                                             null);
         mInputView.setOnKeyboardActionListener(this);
-        mInputView.setKeyboard(mQwertyKeyboard);
         mInputView.setKeyFlinger(this);
+        setConfigedKeyboard();
         return mInputView;
     }
 
@@ -167,6 +199,8 @@ public class KeyFlinger extends InputMethodService
     {
 		Log.d(TAG, "onStartInput");
         super.onStartInput(attribute, restarting);
+
+        mInputAttribute = attribute;
         
         // Reset our state.  We want to do this even if restarting, because
         // the underlying state of the text editor could have changed in any way.
@@ -191,13 +225,13 @@ public class KeyFlinger extends InputMethodService
         case EditorInfo.TYPE_CLASS_DATETIME:
             // Numbers and dates default to the symbols keyboard, with
             // no extra features.
-            mCurKeyboard = mQwertyKeyboard;
+            // setConfigedKeyboard();
             break;
                 
         case EditorInfo.TYPE_CLASS_PHONE:
             // Phones will also default to the symbols keyboard, though
             // often you will want to have a dedicated phone keyboard.
-            mCurKeyboard = mQwertyKeyboard;
+            // setConfigedKeyboard();
             break;
                 
         case EditorInfo.TYPE_CLASS_TEXT:
@@ -205,7 +239,7 @@ public class KeyFlinger extends InputMethodService
             // normal alphabetic keyboard, and assume that we should
             // be doing predictive text (showing candidates as the
             // user types).
-            mCurKeyboard = mQwertyKeyboard;
+            // setConfigedKeyboard();
             mPredictionOn = true;
                 
             // We now look for a few special variations of text that will
@@ -249,13 +283,13 @@ public class KeyFlinger extends InputMethodService
         default:
             // For all unknown input types, default to the alphabetic
             // keyboard with no special features.
-            mCurKeyboard = mQwertyKeyboard;
+            // setConfigedKeyboard();
             updateShiftKeyState(attribute);
         }
         
         // Update the label on the enter key, depending on what the application
         // says it will do.
-        mCurKeyboard.setImeOptions(getResources(), attribute.imeOptions);
+        getCurKeyboard().setImeOptions(getResources(), attribute.imeOptions);
     }
 
     /**
@@ -276,7 +310,7 @@ public class KeyFlinger extends InputMethodService
         // its window.
         setCandidatesViewShown(false);
         
-        mCurKeyboard = mQwertyKeyboard;
+        setConfigedKeyboard();
         if (mInputView != null)
         {
             mInputView.closing();
@@ -288,7 +322,7 @@ public class KeyFlinger extends InputMethodService
     {
         super.onStartInputView(attribute, restarting);
         // Apply the selected keyboard to the input view.
-        mInputView.setKeyboard(mCurKeyboard);
+        setConfigedKeyboard();
         mInputView.closing();
         loadPrefs();
     }
@@ -507,9 +541,8 @@ public class KeyFlinger extends InputMethodService
      */
     private void updateShiftKeyState(EditorInfo attr)
     {
-        if ((attr != null) &&
-            (mInputView != null) &&
-            (mQwertyKeyboard == mInputView.getKeyboard()))
+        if ((attr != null) && (mInputView != null) &&
+            (getCurKeyboard().isShiftable()))
         {
             int caps = 0;
             EditorInfo ei = getCurrentInputEditorInfo();
@@ -625,20 +658,26 @@ public class KeyFlinger extends InputMethodService
         else if ((primaryCode == Keyboard.KEYCODE_MODE_CHANGE) &&
                  (mInputView != null))
         {
-            Keyboard current = mInputView.getKeyboard();
-            if (current == mQwertyKeyboard)
+            int i = 0;
+            LatinKeyboard current = getCurKeyboard();
+            for (; i < mKeyboards.length; ++i)
             {
-                current = mFlingMTKeyboard;
+                if (current == mKeyboards[i])
+                {
+                    ++i;
+                    break;
+                }
             }
-            else
+            if (i >= mKeyboards.length)
             {
-                current = mQwertyKeyboard;
+                i = 0;
             }
-            mInputView.setKeyboard(current);
-            if (current == mQwertyKeyboard)
-            {
-                current.setShifted(false);
-            }
+            mInputView.setKeyboard(mKeyboards[i]);
+            onStartInput(mInputAttribute, true);
+            // if (current.isShiftable())
+            // {
+            //     current.setShifted(false);
+            // }
         }
         else
         {
@@ -733,8 +772,7 @@ public class KeyFlinger extends InputMethodService
             return;
         }
         
-        Keyboard currentKeyboard = mInputView.getKeyboard();
-        if (mQwertyKeyboard == currentKeyboard)
+        if (getCurKeyboard().isShiftable())
         {
             // Alphabet keyboard
             checkToggleCapsLock();
@@ -886,6 +924,24 @@ public class KeyFlinger extends InputMethodService
               "flingUp: " + key.mDLabels[LatinKeyboard.KEY_INDEX_UP]);
     }
 
+    protected void setConfigedKeyboard()
+    {
+        mCurKeyboard = (LatinKeyboard)mKeyboardMap.get(mKeyboardName);
+        if (mInputView != null)
+        {
+            mInputView.setKeyboard(mCurKeyboard);
+        }
+    }
+
+    public LatinKeyboard getCurKeyboard()
+    {
+        if (mInputView != null)
+        {
+            mCurKeyboard = (LatinKeyboard)mInputView.getKeyboard();
+        }
+        return mCurKeyboard;
+    }
+    
     protected void loadPrefs()
     {
         SharedPreferences sp =
@@ -893,9 +949,11 @@ public class KeyFlinger extends InputMethodService
 
         try
         {
+            mKeyboardName = sp.getString("keyboard", DEF_KEYBOARD_NAME);
             mLongPressEnabled = sp.getBoolean("longpress", true);
             mTouchSlop = Integer.parseInt(sp.getString("touchSlop", "10"));
-            mDoubleTapSlop = Integer.parseInt(sp.getString("doubleTapSlop", "100"));
+            mDoubleTapSlop =
+                Integer.parseInt(sp.getString("doubleTapSlop", "100"));
             mMinFlingVelocity =
                 Integer.parseInt(sp.getString("minFlingVelocity", "5"));
         }

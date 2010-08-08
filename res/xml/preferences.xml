@@ -20,6 +20,14 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+  <ListPreference
+     android:key="keyboard"
+     android:title="@string/pref_keyboard_title"
+     android:defaultValue="kb_qwerty"
+     android:entries="@array/pref_keyboard_entries"
+     android:entryValues="@array/pref_keyboard_values"
+     />
+
   <CheckBoxPreference
      android:key="longpress"
      android:title="@string/pref_longpress_title"
