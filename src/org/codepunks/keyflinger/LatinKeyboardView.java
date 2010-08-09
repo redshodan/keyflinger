@@ -79,6 +79,8 @@ public class LatinKeyboardView extends KeyboardView
     private Rect mTextRect;
     private Paint mPaint;
     private DisplayMetrics mMetrics;
+    private float mShadowRadius;
+    private int mShadowColor;
     
     public LatinKeyboardView(Context context, AttributeSet attrs)
     {
@@ -99,6 +101,8 @@ public class LatinKeyboardView extends KeyboardView
 
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
+        mPaint.setTextAlign(Paint.Align.CENTER);
+        mPaint.setTypeface(Typeface.DEFAULT);
         mPaint.setAlpha(255);
 
         mDrawRect = new Rect();
@@ -107,6 +111,9 @@ public class LatinKeyboardView extends KeyboardView
         mMetrics = new DisplayMetrics();
         ((WindowManager)getContext().getSystemService(Context.WINDOW_SERVICE))
             .getDefaultDisplay().getMetrics(mMetrics);
+
+        mShadowRadius = 3;
+        mShadowColor = 0x00000000;
     }
 
     public void setKeyFlinger(KeyFlinger kf)
@@ -331,9 +338,8 @@ public class LatinKeyboardView extends KeyboardView
         {
             tsize = tsize + 1;
         }
+        Log.d(TAG, String.format("scale=%f tsize=%f", scale, tsize));
         paint.setTextSize((int)tsize);
-        paint.setTextAlign(Paint.Align.LEFT);
-        paint.setTypeface(Typeface.DEFAULT);
         if (mMiniKeyboardOnScreen)
         {
             paint.setColor(0xAAAAAAAA);
@@ -363,34 +369,33 @@ public class LatinKeyboardView extends KeyboardView
                 
                 label = adjustCase(key.mDLabels[j]).toString();
                 paint.getTextBounds(label, 0, label.length(), mTextRect);
+                double w = Math.abs(mTextRect.left) + Math.abs(mTextRect.right);
+                double h = Math.abs(mTextRect.top) + Math.abs(mTextRect.bottom);
+                double xoff = key.mDOffsets[j][0] * scale;
+                double yoff = key.mDOffsets[j][1] * scale;
                 if (j == LatinKeyboard.KEY_INDEX_UP)
                 {
-                    x = key.width / 4.0 + key.mDOffsets[j][0] * scale;
-                    y = Math.abs(mTextRect.top) + Math.abs(mTextRect.bottom) +
-                        padding + key.mDOffsets[j][1] * scale;
+                    x = key.width / 4.0 + w / 2.0 + xoff;
+                    y = 2.5 * scale + h + h / 2.0 + yoff;
                 }
                 else if (j == LatinKeyboard.KEY_INDEX_DOWN)
                 {
-                    x = key.width * 3.0 / 4.0 - Math.abs(mTextRect.right) +
-                        key.mDOffsets[j][0] * scale;
-                    y = key.height - padding + key.mDOffsets[j][1] * scale;
+                    x = key.width * 3.0 / 4.0 - w / 2.0 + xoff;
+                    y = key.height - 2.5 * scale - h / 2.0 + yoff;
                 }
                 else if (j == LatinKeyboard.KEY_INDEX_LEFT)
                 {
-                    x = 5.0 * scale + key.mDOffsets[j][0] * scale;
-                    y = key.height / 2 +
-                        (paint.getTextSize() - paint.descent()) / 2.0 +
-                        key.mDOffsets[j][1] * scale;
+                    x = 4.0 * scale + w / 2.0 + xoff;
+                    y = key.height / 2 + h / 2.0 + yoff;
                 }
                 else if (j == LatinKeyboard.KEY_INDEX_RIGHT)
                 {
-                    x = key.width - 5.0 * scale - Math.abs(mTextRect.right) +
-                        key.mDOffsets[j][0] * scale;
-                    y = key.height / 2.0 +
-                        (paint.getTextSize() - paint.descent()) / 2.0 +
-                        key.mDOffsets[j][1] * scale;
+                    x = key.width - 4.0 * scale - w / 2.0 + xoff;
+                    y = key.height / 2.0 + h / 2.0 + yoff;
                 }
+                paint.setShadowLayer(mShadowRadius, 0, 0, mShadowColor);
                 canvas.drawText(label, Math.round(x), Math.round(y), paint);
+                paint.setShadowLayer(0, 0, 0, 0);
             }
 
             canvas.translate(- key.x - getPaddingLeft(),

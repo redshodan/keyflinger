@@ -971,6 +971,7 @@ public class KeyFlinger extends InputMethodService
             break;
             
         case EditorInfo.TYPE_CLASS_TEXT:
+        default:
             Log.d(TAG, "Setting type TEXT");
             mCurKeyboard = (LatinKeyboard)mKeyboardMap.get(mKeyboardName);
             break;

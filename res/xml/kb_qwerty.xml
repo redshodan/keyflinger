@@ -72,7 +72,7 @@
              android:popupKeyboard="@xml/minipopup"
              keyflinger:keyLeftCode="48" keyflinger:keyLeftLabel="0"
              keyflinger:keyUpCode="96" keyflinger:keyUpLabel="`"
-             keyflinger:keyUpYOff="-5"
+             keyflinger:keyUpYOff="-10"
              keyflinger:keyRightCode="126" keyflinger:keyRightLabel="~"
              keyflinger:keyDownCode="42" keyflinger:keyDownLabel="*"
              android:keyEdgeFlags="right"/>
@@ -123,7 +123,9 @@
         <Key android:codes="92" android:keyLabel="\\" 
              keyflinger:keyLeftCode="109" keyflinger:keyLeftLabel="m"
              keyflinger:keyUpCode="124" keyflinger:keyUpLabel="|"
+             keyflinger:keyUpYOff="-5"
              keyflinger:keyRightCode="58" keyflinger:keyRightLabel=":"
+             keyflinger:keyRightXOff="-2"
              keyflinger:keyDownCode="59" keyflinger:keyDownLabel=";"
              android:keyEdgeFlags="right"/>
     </Row>
@@ -150,7 +152,9 @@
              keyflinger:keyLeftCode="60" keyflinger:keyLeftLabel="&lt;"
              keyflinger:keyUpCode="62" keyflinger:keyUpLabel="&gt;"
              keyflinger:keyRightCode="44" keyflinger:keyRightLabel=","
+             keyflinger:keyRightXOff="-2"
              keyflinger:keyDownCode="46" keyflinger:keyDownLabel="."
+             keyflinger:keyDownYOff="-2"
              android:keyEdgeFlags="right" android:isRepeatable="true"/>
     </Row>
 
