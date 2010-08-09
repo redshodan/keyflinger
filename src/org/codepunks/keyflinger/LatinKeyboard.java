@@ -174,15 +174,6 @@ public class LatinKeyboard extends Keyboard
                 Log.d(TAG, "Exception: " + e.toString());
             }
         }
-        
-        /**
-         * Overriding this method so that we can reduce the target area for the
-         * key that closes the keyboard. 
-         */
-        @Override public boolean isInside(int x, int y)
-        {
-            return super.isInside(x, codes[0] == KEYCODE_CANCEL ? y - 10 : y);
-        }
     }
 
     public boolean isShiftable()

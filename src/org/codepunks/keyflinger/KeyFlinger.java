@@ -225,7 +225,10 @@ public class KeyFlinger extends InputMethodService
         mCompletionOn = false;
         mCompletions = null;
 
-        setConfigedKeyboard();
+        if (reset_kb)
+        {
+            setConfigedKeyboard();
+        }
 
         // We are now going to initialize our state based on the type of
         // text being edited.
