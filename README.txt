@@ -17,3 +17,6 @@ Attribution
 KeyFlinger is derived from the Android Open Source Project's SoftKeyboard sample
 code. The SoftKeyboard code is also licensed under the Apache Licensed, Version
 2.0.
+KeyFlinger also contains code derived from the Android Open Source Project core
+code. The Android Open Source Project core code is also licensed under the 
+Apache Licensed, Version 2.0.

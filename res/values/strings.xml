@@ -28,6 +28,7 @@
     <string name="label_go_key">Go</string>
     <string name="label_next_key">Next</string>
     <string name="label_send_key">Send</string>
+    <string name="label_phone_key">123</string>
 
     <!-- Preferences -->
     <string-array name="pref_keyboard_entries">

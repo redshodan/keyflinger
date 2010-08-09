@@ -81,7 +81,9 @@ public class KeyFlinger extends InputMethodService
     private boolean mCapsLock;
     private long mLastShiftTime;
     private long mMetaState;
-    
+
+    private LatinKeyboard mKeyboardPhone;
+    private LatinKeyboard mKeyboardPhoneSymbols;
     private LatinKeyboard[] mKeyboards = new LatinKeyboard[3];
     private Map<String,LatinKeyboard> mKeyboardMap;
     private int[] mKeyboardResList =
@@ -132,8 +134,8 @@ public class KeyFlinger extends InputMethodService
             mKeyboards[i] = new LatinKeyboard(this, r);
             mKeyboardMap.put(res.getResourceEntryName(r), mKeyboards[i]);
         }
-
-        setConfigedKeyboard();
+        mKeyboardPhone = new LatinKeyboard(this, R.xml.kb_phone);
+        mKeyboardPhoneSymbols = new LatinKeyboard(this, R.xml.kb_phone_symbols);
     }
 
     /**
@@ -197,6 +199,12 @@ public class KeyFlinger extends InputMethodService
      */
     @Override public void onStartInput(EditorInfo attribute, boolean restarting)
     {
+        onStartInputFlinger(attribute, restarting, true);
+    }
+    
+    public void onStartInputFlinger(EditorInfo attribute, boolean restarting,
+                                    boolean reset_kb)
+    {
 		Log.d(TAG, "onStartInput");
         super.onStartInput(attribute, restarting);
 
@@ -216,7 +224,9 @@ public class KeyFlinger extends InputMethodService
         mPredictionOn = false;
         mCompletionOn = false;
         mCompletions = null;
-        
+
+        setConfigedKeyboard();
+
         // We are now going to initialize our state based on the type of
         // text being edited.
         switch (attribute.inputType & EditorInfo.TYPE_MASK_CLASS)
@@ -225,13 +235,11 @@ public class KeyFlinger extends InputMethodService
         case EditorInfo.TYPE_CLASS_DATETIME:
             // Numbers and dates default to the symbols keyboard, with
             // no extra features.
-            // setConfigedKeyboard();
             break;
                 
         case EditorInfo.TYPE_CLASS_PHONE:
             // Phones will also default to the symbols keyboard, though
             // often you will want to have a dedicated phone keyboard.
-            // setConfigedKeyboard();
             break;
                 
         case EditorInfo.TYPE_CLASS_TEXT:
@@ -239,7 +247,6 @@ public class KeyFlinger extends InputMethodService
             // normal alphabetic keyboard, and assume that we should
             // be doing predictive text (showing candidates as the
             // user types).
-            // setConfigedKeyboard();
             mPredictionOn = true;
                 
             // We now look for a few special variations of text that will
@@ -284,6 +291,7 @@ public class KeyFlinger extends InputMethodService
             // For all unknown input types, default to the alphabetic
             // keyboard with no special features.
             // setConfigedKeyboard();
+            Log.d(TAG, "Starting type DEFAULT");
             updateShiftKeyState(attribute);
         }
         
@@ -298,6 +306,8 @@ public class KeyFlinger extends InputMethodService
      */
     @Override public void onFinishInput()
     {
+        Log.d(TAG, "onFinishInput");
+
         super.onFinishInput();
         
         // Clear current composing text and candidates.
@@ -320,9 +330,10 @@ public class KeyFlinger extends InputMethodService
     @Override public void onStartInputView(EditorInfo attribute,
                                            boolean restarting)
     {
+        Log.d(TAG, "onStartInputView");
         super.onStartInputView(attribute, restarting);
         // Apply the selected keyboard to the input view.
-        setConfigedKeyboard();
+        mInputView.setKeyboard(mCurKeyboard);
         mInputView.closing();
         loadPrefs();
     }
@@ -658,22 +669,35 @@ public class KeyFlinger extends InputMethodService
         else if ((primaryCode == Keyboard.KEYCODE_MODE_CHANGE) &&
                  (mInputView != null))
         {
-            int i = 0;
-            LatinKeyboard current = getCurKeyboard();
-            for (; i < mKeyboards.length; ++i)
+            Log.d(TAG, "Keyboard mode change");
+            if (mCurKeyboard == mKeyboardPhone)
             {
-                if (current == mKeyboards[i])
+                mCurKeyboard = mKeyboardPhoneSymbols;
+            }
+            else if (mCurKeyboard == mKeyboardPhoneSymbols)
+            {
+                mCurKeyboard = mKeyboardPhone;
+            }
+            else
+            {
+                int i = 0;
+                LatinKeyboard current = getCurKeyboard();
+                for (; i < mKeyboards.length; ++i)
                 {
-                    ++i;
-                    break;
+                    if (current == mKeyboards[i])
+                    {
+                        ++i;
+                        break;
+                    }
                 }
+                if (i >= mKeyboards.length)
+                {
+                    i = 0;
+                }
+                mCurKeyboard = mKeyboards[i];
             }
-            if (i >= mKeyboards.length)
-            {
-                i = 0;
-            }
-            mInputView.setKeyboard(mKeyboards[i]);
-            onStartInput(mInputAttribute, true);
+            mInputView.setKeyboard(mCurKeyboard);
+            onStartInputFlinger(mInputAttribute, true, false);
             // if (current.isShiftable())
             // {
             //     current.setShifted(false);
@@ -926,7 +950,32 @@ public class KeyFlinger extends InputMethodService
 
     protected void setConfigedKeyboard()
     {
-        mCurKeyboard = (LatinKeyboard)mKeyboardMap.get(mKeyboardName);
+        switch (mInputAttribute.inputType & EditorInfo.TYPE_MASK_CLASS)
+        {
+        case EditorInfo.TYPE_CLASS_NUMBER:
+        case EditorInfo.TYPE_CLASS_DATETIME:
+            // Numbers and dates default to the symbols keyboard, with
+            // no extra features.
+            Log.d(TAG, "Setting type NUMBER/DATETIME");
+            break;
+                
+        case EditorInfo.TYPE_CLASS_PHONE:
+            // Phones will also default to the symbols keyboard, though
+            // often you will want to have a dedicated phone keyboard.
+            Log.d(TAG, "Setting type PHONE");
+            if ((mCurKeyboard != mKeyboardPhone) &&
+                (mCurKeyboard != mKeyboardPhoneSymbols))
+            {
+                mCurKeyboard = mKeyboardPhone;
+            }
+            break;
+            
+        case EditorInfo.TYPE_CLASS_TEXT:
+            Log.d(TAG, "Setting type TEXT");
+            mCurKeyboard = (LatinKeyboard)mKeyboardMap.get(mKeyboardName);
+            break;
+        }
+               
         if (mInputView != null)
         {
             mInputView.setKeyboard(mCurKeyboard);
