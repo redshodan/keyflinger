@@ -33,12 +33,14 @@
     <!-- Preferences -->
     <string-array name="pref_keyboard_entries">
       <item>QWERTY</item>
-      <item>Single Touch</item>
+      <item>Single Touch - Outside</item>
+      <item>Single Touch - Center</item>
       <item>Multi Touch</item>
     </string-array>
     <string-array name="pref_keyboard_values">
       <item>kb_qwerty</item>
-      <item>kb_singletouch</item>
+      <item>kb_st_outside</item>
+      <item>kb_st_center</item>
       <item>kb_multitouch</item>
     </string-array>
     <string name="pref_keyboard_title">Keyboard Type</string>

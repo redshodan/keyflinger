@@ -82,14 +82,16 @@ public class KeyFlinger extends InputMethodService
     private long mLastShiftTime;
     private long mMetaState;
 
+    private LatinKeyboard mKeyboardSymbols;
     private LatinKeyboard mKeyboardPhone;
     private LatinKeyboard mKeyboardPhoneSymbols;
-    private LatinKeyboard[] mKeyboards = new LatinKeyboard[3];
+    private LatinKeyboard[] mKeyboards;
     private Map<String,LatinKeyboard> mKeyboardMap;
     private int[] mKeyboardResList =
     {
        R.xml.kb_qwerty,
-       R.xml.kb_singletouch,
+       R.xml.kb_st_outside,
+       R.xml.kb_st_center,
        R.xml.kb_multitouch
     };
     private Map<String,Integer> mKeyboardResMap;
@@ -127,6 +129,7 @@ public class KeyFlinger extends InputMethodService
             mKeyboardResMap.put(res.getResourceEntryName(r), r);
         }
 
+        mKeyboards = new LatinKeyboard[mKeyboardResList.length];
         mKeyboardMap = new HashMap<String,LatinKeyboard>();
         for (int i = 0; i < mKeyboardResList.length; ++i)
         {
@@ -134,6 +137,7 @@ public class KeyFlinger extends InputMethodService
             mKeyboards[i] = new LatinKeyboard(this, r);
             mKeyboardMap.put(res.getResourceEntryName(r), mKeyboards[i]);
         }
+        mKeyboardSymbols = new LatinKeyboard(this, R.xml.kb_symbols);
         mKeyboardPhone = new LatinKeyboard(this, R.xml.kb_phone);
         mKeyboardPhoneSymbols = new LatinKeyboard(this, R.xml.kb_phone_symbols);
     }
@@ -444,6 +448,8 @@ public class KeyFlinger extends InputMethodService
      */
     @Override public boolean onKeyDown(int keyCode, KeyEvent event)
     {
+        Log.d(TAG, String.format("onKeyDown: %d : %s", keyCode,
+                                 event.toString()));
         switch (keyCode)
         {
         case KeyEvent.KEYCODE_BACK:
@@ -621,6 +627,7 @@ public class KeyFlinger extends InputMethodService
 
     public void ignoreNextKey()
     {
+        Log.d(TAG, "ignoreNextKey()");
         mIgnoreNextKey = true;
     }
     
@@ -628,8 +635,27 @@ public class KeyFlinger extends InputMethodService
 
     public void onKey(int primaryCode, int[] keyCodes)
     {
+        Log.d(TAG, String.format("onKey: %d : %s", primaryCode,
+                                 String.valueOf((char) primaryCode)));
+        // if (primaryCode == -10)
+        // {
+        //     primaryCode = keyCodes[0];
+        // }
+        if (keyCodes != null)
+        {
+            for (int i = 0; i < keyCodes.length; ++i)
+            {
+                if (keyCodes[i] == -1)
+                {
+                    break;
+                }
+                Log.d(TAG, String.format("keyCode[%d]=%d", i, keyCodes[i]));
+            }
+        }
+
         if (mIgnoreNextKey)
         {
+            Log.d(TAG, "mIgnoreNextKey set, ignoring");
             mIgnoreNextKey = false;
             return;
         }
@@ -651,6 +677,19 @@ public class KeyFlinger extends InputMethodService
         else if (primaryCode == Keyboard.KEYCODE_SHIFT)
         {
             handleShift();
+        }
+        else if (primaryCode == Keyboard.KEYCODE_ALT)
+        {
+            if (mCurKeyboard == mKeyboardSymbols)
+            {
+                setConfigedKeyboard();
+            }
+            else
+            {
+                mCurKeyboard = mKeyboardSymbols;
+                mInputView.setKeyboard(mCurKeyboard);
+                onStartInputFlinger(mInputAttribute, true, false);
+            }
         }
         else if (primaryCode == Keyboard.KEYCODE_CANCEL)
         {
@@ -714,6 +753,7 @@ public class KeyFlinger extends InputMethodService
 
     public void onText(CharSequence text)
     {
+        Log.d(TAG, String.format("onText: %s", text.toString()));
         InputConnection ic = getCurrentInputConnection();
         if (ic == null)
         {

@@ -137,6 +137,7 @@ public class LatinKeyboardView extends KeyboardView
                     float deltaX = e.up.getX(idx) - e.down.getX(idx);
                     float deltaY = e.up.getY(idx) - e.down.getY(idx);
                     int code = NOT_A_KEY;
+                    int index = -1;
                     if (mDownKey == NOT_A_KEY)
                     {
                         Log.d(TAG, "Passing in onFling. Bad key.");
@@ -145,31 +146,36 @@ public class LatinKeyboardView extends KeyboardView
                     if ((absY < absX) && (deltaX > travelX))
                     {
                         mKeyFlinger.flingRight(mKeys[mDownKey]);
-                        code = mKeys[mDownKey].mDCodes[
-                            LatinKeyboard.KEY_INDEX_RIGHT];
+                        index = LatinKeyboard.KEY_INDEX_RIGHT;
                     }
                     else if ((absY < absX) & (deltaX < -travelX))
                     {
                         mKeyFlinger.flingLeft(mKeys[mDownKey]);
-                        code = mKeys[mDownKey].mDCodes[
-                            LatinKeyboard.KEY_INDEX_LEFT];
+                        index = LatinKeyboard.KEY_INDEX_LEFT;
                     }
                     else if ((absX < absY) && (deltaY < -travelY))
                     {
                         mKeyFlinger.flingUp(mKeys[mDownKey]);
-                        code = mKeys[mDownKey].mDCodes[
-                            LatinKeyboard.KEY_INDEX_UP];
+                        index = LatinKeyboard.KEY_INDEX_UP;
                     }
                     else if ((absX < absY / 2) && (deltaY > travelY))
                     {
                         mKeyFlinger.flingDown(mKeys[mDownKey]);
-                        code = mKeys[mDownKey].mDCodes[
-                            LatinKeyboard.KEY_INDEX_DOWN];
+                        index = LatinKeyboard.KEY_INDEX_DOWN;
                     }
-                    if (code != NOT_A_KEY)
+                    if (index > -1)
                     {
-                        detectAndSendKey(mDownKey, code);
-                        return true;
+                        code = mKeys[mDownKey].mDCodes[index];
+                        if (code == -10)
+                        {
+                            code = (int)(char)
+                                mKeys[mDownKey].mDLabels[index].charAt(0);
+                        }
+                        if (code != NOT_A_KEY)
+                        {
+                            detectAndSendKey(mDownKey, code);
+                            return true;
+                        }
                     }
                     Log.d(TAG, "Passing in onFling");
                     return false;
