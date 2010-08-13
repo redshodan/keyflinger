@@ -166,7 +166,7 @@ public class LatinKeyboardView extends KeyboardView
                     if (index > -1)
                     {
                         code = mKeys[mDownKey].mDCodes[index];
-                        if (code == -10)
+                        if (code == LatinKeyboard.KEYCODE_UNICODE)
                         {
                             code = (int)(char)
                                 mKeys[mDownKey].mDLabels[index].charAt(0);

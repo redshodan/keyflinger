@@ -50,6 +50,7 @@ public class LatinKeyboard extends Keyboard
     static final public int KEY_INDEX_MAX = 4;
     static final public int KEYCODE_CTL = -10;
     static final public int KEYCODE_ESC = -11;
+    static final public int KEYCODE_UNICODE = -20;
     private Key mEnterKey;
 
     public LatinKeyboard(Context context, int xmlLayoutResId)

@@ -637,10 +637,6 @@ public class KeyFlinger extends InputMethodService
     {
         Log.d(TAG, String.format("onKey: %d : %s", primaryCode,
                                  String.valueOf((char) primaryCode)));
-        // if (primaryCode == -10)
-        // {
-        //     primaryCode = keyCodes[0];
-        // }
         if (keyCodes != null)
         {
             for (int i = 0; i < keyCodes.length; ++i)
