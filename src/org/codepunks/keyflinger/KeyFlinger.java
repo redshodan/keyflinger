@@ -225,6 +225,7 @@ public class KeyFlinger extends InputMethodService
             mMetaState = 0;
         }
         
+        mIgnoreNextKey = false;
         mPredictionOn = false;
         mCompletionOn = false;
         mCompletions = null;
@@ -254,7 +255,7 @@ public class KeyFlinger extends InputMethodService
             // normal alphabetic keyboard, and assume that we should
             // be doing predictive text (showing candidates as the
             // user types).
-            mPredictionOn = true;
+            // mPredictionOn = true;
                 
             // We now look for a few special variations of text that will
             // modify our behavior.

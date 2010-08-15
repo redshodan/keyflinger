@@ -174,7 +174,14 @@ public class LatinKeyboardView extends KeyboardView
                         if (code != NOT_A_KEY)
                         {
                             detectAndSendKey(mDownKey, code);
-                            return true;
+                            if (code == -2)
+                            {
+                                return false;
+                            }
+                            else
+                            {
+                                return true;
+                            }
                         }
                     }
                     Log.d(TAG, "Passing in onFling");
