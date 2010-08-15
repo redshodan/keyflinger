@@ -49,8 +49,8 @@
         <Key android:keyLabel="³"
              keyflinger:keyLeftCode="-20" keyflinger:keyLeftLabel="¹"
              keyflinger:keyUpCode="-20" keyflinger:keyUpLabel="²"
-             keyflinger:keyRightCode="-20" keyflinger:keyRightLabel="⁴"
-             keyflinger:keyDownCode="-20" keyflinger:keyDownLabel="ⁿ"
+             keyflinger:keyRightCode="-20" keyflinger:keyRightLabel="ⁿ"
+             keyflinger:keyDownCode="-20" keyflinger:keyDownLabel="⁴"
              android:keyEdgeFlags="left" />
         <Key android:keyLabel="¼"
              keyflinger:keyLeftCode="-20" keyflinger:keyLeftLabel="½"
@@ -60,8 +60,8 @@
         <Key android:codes="-20" android:keyLabel="⅝"
              keyflinger:keyLeftCode="-20" keyflinger:keyLeftLabel="¾"
              keyflinger:keyUpCode="-20" keyflinger:keyUpLabel="⅜"
-             keyflinger:keyRightCode="-20" keyflinger:keyRightLabel="⅞"
-             keyflinger:keyDownCode="-20" keyflinger:keyDownLabel="•"/>
+             keyflinger:keyRightCode="-20" keyflinger:keyRightLabel="•"
+             keyflinger:keyDownCode="-20" keyflinger:keyDownLabel="⅞"/>
         <Key android:codes="-20" android:keyLabel="¿" 
              keyflinger:keyLeftCode="-20" keyflinger:keyLeftLabel="°"
              keyflinger:keyUpCode="-20" keyflinger:keyUpLabel="¡"
@@ -108,22 +108,20 @@
         <Key android:codes="-20" android:keyLabel="»"
              keyflinger:keyLeftCode="-20" keyflinger:keyLeftLabel="‹"
              keyflinger:keyUpCode="-20" keyflinger:keyUpLabel="≥"
-             keyflinger:keyRightCode="98" keyflinger:keyRightLabel="b"
+             keyflinger:keyRightCode="-20" keyflinger:keyRightLabel=" "
              keyflinger:keyDownCode="-20" keyflinger:keyDownLabel="›" />
-        <Key android:codes="92" android:keyLabel="\\" 
-             keyflinger:keyLeftCode="109" keyflinger:keyLeftLabel="m"
-             keyflinger:keyUpCode="124" keyflinger:keyUpLabel="|"
-             keyflinger:keyUpYOff="-5"
-             keyflinger:keyRightCode="58" keyflinger:keyRightLabel=":"
-             keyflinger:keyRightXOff="-2"
-             keyflinger:keyDownCode="59" keyflinger:keyDownLabel=";"
+        <Key android:codes="-20" android:keyLabel=" " 
+             keyflinger:keyLeftCode="-20" keyflinger:keyLeftLabel=" "
+             keyflinger:keyUpCode="-20" keyflinger:keyUpLabel=" "
+             keyflinger:keyRightCode="-20" keyflinger:keyRightLabel=" "
+             keyflinger:keyDownCode="-20" keyflinger:keyDownLabel=" "
              android:keyEdgeFlags="right"/>
     </Row>
     <Row>
         <Key android:codes="-3" android:keyIcon="@drawable/sym_keyboard_done" 
              keyflinger:keyUpCode="-6" keyflinger:keyUpLabel="ABC"
              keyflinger:keyUpYOff="-3"
-             keyflinger:keyRightCode="-2" keyflinger:keyRightLabel="mode"
+             keyflinger:keyRightCode="-2" keyflinger:keyRightLabel="kbd"
              android:keyEdgeFlags="left"/>
         <Key android:codes="10" android:keyIcon="@drawable/sym_keyboard_return"
              keyflinger:keyLeftCode="-1" keyflinger:keyLeftLabel="shift"
@@ -134,18 +132,16 @@
              keyflinger:keyDownCode="9" keyflinger:keyDownLabel="tab"
              />
         <Key android:codes="32" android:keyIcon="@drawable/sym_keyboard_space"
-             keyflinger:keyLeftCode="63" keyflinger:keyLeftLabel="\?"
-             keyflinger:keyUpCode="47" keyflinger:keyUpLabel="/" 
-             keyflinger:keyRightCode="34" keyflinger:keyRightLabel="&quot;"
-             keyflinger:keyDownCode="39" keyflinger:keyDownLabel="\'"
+             keyflinger:keyLeftCode="-20" keyflinger:keyLeftLabel=" "
+             keyflinger:keyUpCode="-20" keyflinger:keyUpLabel=" " 
+             keyflinger:keyRightCode="-20" keyflinger:keyRightLabel=" "
+             keyflinger:keyDownCode="-20" keyflinger:keyDownLabel=" "
              android:isRepeatable="true"/>
         <Key android:codes="-5" android:keyIcon="@drawable/sym_keyboard_delete" 
-             keyflinger:keyLeftCode="60" keyflinger:keyLeftLabel="&lt;"
-             keyflinger:keyUpCode="62" keyflinger:keyUpLabel="&gt;"
-             keyflinger:keyRightCode="44" keyflinger:keyRightLabel=","
-             keyflinger:keyRightXOff="-2"
-             keyflinger:keyDownCode="46" keyflinger:keyDownLabel="."
-             keyflinger:keyDownYOff="-2"
+             keyflinger:keyLeftCode="-20" keyflinger:keyLeftLabel=" "
+             keyflinger:keyUpCode="-20" keyflinger:keyUpLabel=" "
+             keyflinger:keyRightCode="-20" keyflinger:keyRightLabel=" "
+             keyflinger:keyDownCode="-20" keyflinger:keyDownLabel=" "
              android:keyEdgeFlags="right" android:isRepeatable="true"/>
     </Row>
 
