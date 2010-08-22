@@ -2,3 +2,4 @@
 - finish plumbing up multitouching
 - define the multitouch swipe mappings
 - add in fling long presses for minikeyboards
+- hilight letters to differentiate between symbols
