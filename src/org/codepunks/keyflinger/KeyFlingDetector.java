@@ -36,11 +36,14 @@ import org.codepunks.keyflinger.util.VelocityTracker;
 import android.os.Handler;
 import android.os.Message;
 import android.content.Context;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 
 public class KeyFlingDetector
 {
+    static private String TAG = "KeyFlinger";
+
     public class FlingEvent
     {
         public static final int ACTION_NONE = 0;
@@ -190,48 +193,45 @@ public class KeyFlingDetector
 
     private VelocityTracker mVelocityTracker;
 
-    private class GestureHandler extends Handler {
-        FlingState mFling;
-        int mIdx;
-        int mPid;
-        
-        GestureHandler() {
+    private class GestureHandler extends Handler
+    {
+        GestureHandler()
+        {
             super();
         }
 
-        GestureHandler(Handler handler) {
+        GestureHandler(Handler handler)
+        {
             super(handler.getLooper());
         }
-
-        public void setFlingState(FlingState fling, int idx, int pid)
-        {
-            mFling = fling;
-            mIdx = idx;
-            mPid = pid;
-        }
         
-        @Override
-        public void handleMessage(Message msg)
+        @Override public void handleMessage(Message msg)
         {
+            int idx = msg.arg1;
+            int pid = msg.arg2;
+            FlingState fling = (FlingState)msg.obj;
+
+            Log.d(TAG, String.format("handleMessage: msg=%d idx=%d pid=%d",
+                                     msg.what, idx, pid));
             switch (msg.what)
             {
             case SHOW_PRESS:
-                mListener.onShowPress(mFling.mCurrentDownEvent, mIdx, mPid);
+                mListener.onShowPress(fling.mCurrentDownEvent, idx, pid);
                 break;
                 
             case LONG_PRESS:
                 if (mIsLongpressEnabled)
                 {
-                    dispatchLongPress(mFling, mIdx, mPid);
+                    dispatchLongPress(fling, idx, pid);
                 }
                 break;
                 
             case TAP:
                 // If the user's finger is still down, do not count it as a tap
-                if (mDoubleTapListener != null && !mFling.mStillDown)
+                if (mDoubleTapListener != null && !fling.mStillDown)
                 {
                     mDoubleTapListener.onSingleTapConfirmed(
-                        mFling.mCurrentDownEvent, mIdx, mPid);
+                        fling.mCurrentDownEvent, idx, pid);
                 }
                 break;
 
@@ -367,11 +367,6 @@ public class KeyFlingDetector
         final float y = ev.getY(idx);
         final float x = ev.getX(idx);
 
-        if (mHandler instanceof GestureHandler)
-        {
-            ((GestureHandler)mHandler).setFlingState(fling, pid, idx);
-        }
-
         if (mFlingEvents[pid].action == FlingEvent.ACTION_NONE)
         {
             mFlingEvents[pid].action = FlingEvent.ACTION_STARTED;
@@ -404,7 +399,9 @@ public class KeyFlingDetector
                 else
                 {
                     // This is a first tap
-                    mHandler.sendEmptyMessageDelayed(TAP, DOUBLE_TAP_TIMEOUT);
+                    mHandler.sendMessageDelayed(
+                        Message.obtain(mHandler, TAP, idx, pid, fling),
+                        DOUBLE_TAP_TIMEOUT);
                 }
             }
 
@@ -419,12 +416,14 @@ public class KeyFlingDetector
             if (mIsLongpressEnabled)
             {
                 mHandler.removeMessages(LONG_PRESS);
-                mHandler.sendEmptyMessageAtTime(
-                    LONG_PRESS, fling.mCurrentDownEvent.getDownTime() +
-                    TAP_TIMEOUT + LONGPRESS_TIMEOUT);
+                mHandler.sendMessageAtTime(
+                    Message.obtain(mHandler, LONG_PRESS, idx, pid, fling),
+                    fling.mCurrentDownEvent.getDownTime() + TAP_TIMEOUT +
+                    LONGPRESS_TIMEOUT);
             }
-            mHandler.sendEmptyMessageAtTime(
-                SHOW_PRESS, fling.mCurrentDownEvent.getDownTime() + TAP_TIMEOUT);
+            mHandler.sendMessageAtTime(
+                Message.obtain(mHandler, SHOW_PRESS, idx, pid, fling),
+                fling.mCurrentDownEvent.getDownTime() + TAP_TIMEOUT);
             handled |= mListener.onDown(ev, idx, pid);
         }
         else if ((action == MotionEvent.ACTION_MOVE) && !fling.mInLongPress)
@@ -509,6 +508,7 @@ public class KeyFlingDetector
                 mVelocityTracker.recycle();
                 mVelocityTracker = null;
                 fling.mIsDoubleTapping = false;
+                mHandler.removeMessages(TAP);
                 mHandler.removeMessages(SHOW_PRESS);
                 mHandler.removeMessages(LONG_PRESS);
                 mFlingEvents[0].clear();
@@ -559,6 +559,7 @@ public class KeyFlingDetector
 
     private void dispatchLongPress(FlingState fling, int idx, int pid)
     {
+        Log.d(TAG, "dispatchLongPress");
         mHandler.removeMessages(TAP);
         fling.mInLongPress = true;
         mListener.onLongPress(fling.mCurrentDownEvent, idx, pid);

@@ -204,6 +204,7 @@ public class LatinKeyboardView extends KeyboardView
     
     @Override protected boolean onLongPress(Key key)
     {
+        Log.d(TAG, "onLongPress");
         if (mKeyFlinger.mLongPressEnabled)
         {
             if (key.codes[0] == Keyboard.KEYCODE_CANCEL)
@@ -228,7 +229,8 @@ public class LatinKeyboardView extends KeyboardView
         //dumpEvent(e);
         if (mFlingDetector.onTouchEvent(e))
         {
-            mKeyFlinger.ignoreNextKey();
+            Log.d(TAG, "KeyFlingDetector consumed the touch event");
+            e.setAction(MotionEvent.ACTION_CANCEL);
         }
         if (e.getAction() == MotionEvent.ACTION_DOWN)
         {

@@ -100,7 +100,6 @@ public class KeyFlinger extends InputMethodService
     
     private String mWordSeparators;
 
-    private boolean mIgnoreNextKey = false;
     private boolean mIsControlSet = false;
 
     // Public config info
@@ -225,7 +224,6 @@ public class KeyFlinger extends InputMethodService
             mMetaState = 0;
         }
         
-        mIgnoreNextKey = false;
         mPredictionOn = false;
         mCompletionOn = false;
         mCompletions = null;
@@ -626,12 +624,6 @@ public class KeyFlinger extends InputMethodService
         }
     }
 
-    public void ignoreNextKey()
-    {
-        Log.d(TAG, "ignoreNextKey()");
-        mIgnoreNextKey = true;
-    }
-    
     // Implementation of KeyboardViewListener
 
     public void onKey(int primaryCode, int[] keyCodes)
@@ -650,13 +642,6 @@ public class KeyFlinger extends InputMethodService
             }
         }
 
-        if (mIgnoreNextKey)
-        {
-            Log.d(TAG, "mIgnoreNextKey set, ignoring");
-            mIgnoreNextKey = false;
-            return;
-        }
-        
         if (isWordSeparator(primaryCode))
         {
             // Handle separator
