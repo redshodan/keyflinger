@@ -127,6 +127,27 @@ public class LatinKeyboardView extends KeyboardView
             new KeyFlingDetector.FlingListener()
             {
                 @Override
+                public boolean onRepeat(MotionEvent e, int idx, int pid)
+                {
+                    Log.d(TAG, "onRepeat");
+                    int code = mKeys[mDownKey].codes[0];
+                    if ((code != NOT_A_KEY) && mKeys[mDownKey].mIsRepeatable)
+                    {
+                        detectAndSendKey(mDownKey, code);
+                        if (code == -2)
+                        {
+                            return false;
+                        }
+                        else
+                        {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+                
+                @Override
                 public boolean onFling(KeyFlingDetector.FlingEvent[] evs,
                                        int idx, int pid)
                 {

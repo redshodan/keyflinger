@@ -125,6 +125,7 @@ public class LatinKeyboard extends Keyboard
         public int[] mDCodes;
         public String[] mDLabels;
         public int[][] mDOffsets;
+        public boolean mIsRepeatable;
         
         public LatinKey(Resources res, Keyboard.Row parent, int x, int y,
                         XmlResourceParser parser)
@@ -137,6 +138,8 @@ public class LatinKeyboard extends Keyboard
                 mDLabels = new String[MAX];
                 mDOffsets = new int[MAX][2];
                 AttributeSet attrs = Xml.asAttributeSet(parser);
+                mIsRepeatable = attrs.getAttributeBooleanValue(
+                    XMLNS, "isRepeatable", false);
                 for (int i = 0; i < MAX; ++i)
                 {
                     String name;

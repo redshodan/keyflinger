@@ -104,6 +104,7 @@ public class KeyFlingDetector
         boolean onDown(MotionEvent e, int idx, int pid);
         void onShowPress(MotionEvent e, int idx, int pid);
         boolean onSingleTapUp(MotionEvent e, int idx, int pid);
+        boolean onRepeat(MotionEvent e, int idx, int pid);
         boolean onScroll(MotionEvent e1, MotionEvent e2, int idx, int pid,
                          float distanceX, float distanceY);
         void onLongPress(MotionEvent e, int idx, int pid);
@@ -121,6 +122,11 @@ public class KeyFlingDetector
         implements OnGestureListener, OnDoubleTapListener
     {
         public boolean onSingleTapUp(MotionEvent e, int idx, int pid)
+        {
+            return false;
+        }
+
+        public boolean onRepeat(MotionEvent e, int idx, int pid)
         {
             return false;
         }
@@ -170,11 +176,14 @@ public class KeyFlingDetector
     private static final int TAP_TIMEOUT = ViewConfiguration.getTapTimeout();
     private static final int DOUBLE_TAP_TIMEOUT =
         ViewConfiguration.getDoubleTapTimeout();
+    private static final int INITIAL_REPEAT_TIMEOUT = LONGPRESS_TIMEOUT / 2;
+    private static final int REPEAT_TIMEOUT = INITIAL_REPEAT_TIMEOUT / 2;
 
     // constants for Message.what used by GestureHandler below
     private static final int SHOW_PRESS = 1;
     private static final int LONG_PRESS = 2;
     private static final int TAP = 3;
+    private static final int REPEAT = 4;
 
     private final Handler mHandler;
     private final OnGestureListener mListener;
@@ -218,14 +227,12 @@ public class KeyFlingDetector
             case SHOW_PRESS:
                 mListener.onShowPress(fling.mCurrentDownEvent, idx, pid);
                 break;
-                
             case LONG_PRESS:
                 if (mIsLongpressEnabled)
                 {
                     dispatchLongPress(fling, idx, pid);
                 }
                 break;
-                
             case TAP:
                 // If the user's finger is still down, do not count it as a tap
                 if (mDoubleTapListener != null && !fling.mStillDown)
@@ -234,7 +241,15 @@ public class KeyFlingDetector
                         fling.mCurrentDownEvent, idx, pid);
                 }
                 break;
-
+            case REPEAT:
+                if (fling.mAlwaysInTapRegion)
+                {
+                    mListener.onRepeat(fling.mCurrentDownEvent, idx, pid);
+                    mHandler.sendMessageDelayed(
+                        Message.obtain(msg.getTarget(), REPEAT, idx, pid, fling),
+                        REPEAT_TIMEOUT);
+                }
+                break;
             default:
                 throw new RuntimeException("Unknown message " + msg); //never
             }
@@ -381,6 +396,7 @@ public class KeyFlingDetector
                 if (hadTapMessage)
                 {
                     mHandler.removeMessages(TAP);
+                    mHandler.removeMessages(REPEAT);
                 }
                 if ((fling.mCurrentDownEvent != null) &&
                     (fling.mPreviousUpEvent != null) &&
@@ -402,6 +418,9 @@ public class KeyFlingDetector
                     mHandler.sendMessageDelayed(
                         Message.obtain(mHandler, TAP, idx, pid, fling),
                         DOUBLE_TAP_TIMEOUT);
+                    mHandler.sendMessageDelayed(
+                        Message.obtain(mHandler, REPEAT, idx, pid, fling),
+                        INITIAL_REPEAT_TIMEOUT);
                 }
             }
 
@@ -448,6 +467,7 @@ public class KeyFlingDetector
                     fling.mLastMotionY = y;
                     fling.mAlwaysInTapRegion = false;
                     mHandler.removeMessages(TAP);
+                    mHandler.removeMessages(REPEAT);
                     mHandler.removeMessages(SHOW_PRESS);
                     mHandler.removeMessages(LONG_PRESS);
                 }
@@ -477,6 +497,7 @@ public class KeyFlingDetector
             else if (fling.mInLongPress)
             {
                 mHandler.removeMessages(TAP);
+                mHandler.removeMessages(REPEAT);
                 fling.mInLongPress = false;
             }
             else if (fling.mAlwaysInTapRegion)
@@ -509,6 +530,7 @@ public class KeyFlingDetector
                 mVelocityTracker = null;
                 fling.mIsDoubleTapping = false;
                 mHandler.removeMessages(TAP);
+                mHandler.removeMessages(REPEAT);
                 mHandler.removeMessages(SHOW_PRESS);
                 mHandler.removeMessages(LONG_PRESS);
                 mFlingEvents[0].clear();
@@ -520,6 +542,7 @@ public class KeyFlingDetector
             mHandler.removeMessages(SHOW_PRESS);
             mHandler.removeMessages(LONG_PRESS);
             mHandler.removeMessages(TAP);
+            mHandler.removeMessages(REPEAT);
             mVelocityTracker.recycle();
             mVelocityTracker = null;
             fling.mIsDoubleTapping = false;

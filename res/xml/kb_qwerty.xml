@@ -148,7 +148,7 @@
              keyflinger:keyUpCode="47" keyflinger:keyUpLabel="/" 
              keyflinger:keyRightCode="34" keyflinger:keyRightLabel="&quot;"
              keyflinger:keyDownCode="39" keyflinger:keyDownLabel="\'"
-             android:isRepeatable="true"/>
+             keyflinger:isRepeatable="true"/>
         <Key android:codes="-5" android:keyIcon="@drawable/sym_keyboard_delete" 
              keyflinger:keyLeftCode="60" keyflinger:keyLeftLabel="&lt;"
              keyflinger:keyUpCode="62" keyflinger:keyUpLabel="&gt;"
@@ -156,7 +156,7 @@
              keyflinger:keyRightXOff="-2"
              keyflinger:keyDownCode="46" keyflinger:keyDownLabel="."
              keyflinger:keyDownYOff="-2"
-             android:keyEdgeFlags="right" android:isRepeatable="true"/>
+             android:keyEdgeFlags="right" keyflinger:isRepeatable="true"/>
     </Row>
 
 </Keyboard>
