@@ -3,3 +3,4 @@
 - define the multitouch swipe mappings
 - add in fling long presses for minikeyboards
 - hilight letters to differentiate between symbols
+- implement the show for feedback on key invoked
