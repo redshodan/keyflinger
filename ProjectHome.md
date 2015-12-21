@@ -1,0 +1,3 @@
+KeyFlinger is an on screen keyboard for Android phones. It is designed around single and multi-touch finger gestures. Each key is capable of 5 independent gestures, a simple press and a swipe in the four cardinal directions. If your phone is capable of real multi-touch, then KeyFlinger can do multiple gestures that are chorded together to compose a key.
+
+![http://codepunks.org/android/keyflinger.png](http://codepunks.org/android/keyflinger.png)
